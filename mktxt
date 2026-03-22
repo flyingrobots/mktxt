@@ -1,0 +1,31 @@
+#!/bin/bash
+
+# Define the output filename with a timestamp to avoid collisions
+OUTPUT_FILE="mktxt_$(date +%Y%m%d_%H%M%S).txt"
+
+# Get the list of files to process
+if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+    # Use git ls-files to respect .gitignore and only include tracked files
+    FILES=$(git ls-files)
+else
+    # Fallback to find if not in a git repo, excluding hidden directories
+    FILES=$(find . -type f -not -path '*/.*')
+fi
+
+# Iterate over each file and append content if it's not binary
+for file in $FILES; do
+    # Skip the output file itself if it was already created (unlikely given timestamp)
+    if [[ "$file" == "./$OUTPUT_FILE" || "$file" == "$OUTPUT_FILE" ]]; then
+        continue
+    fi
+
+    # Check if the file is a regular file and not binary
+    if [[ -f "$file" ]] && grep -qI . "$file"; then
+        echo "# $file" >> "$OUTPUT_FILE"
+        cat "$file" >> "$OUTPUT_FILE"
+        # Ensure there's at least one newline after each file's content
+        echo -e "\n" >> "$OUTPUT_FILE"
+    fi
+done
+
+echo "Aggregated files into: $OUTPUT_FILE"
