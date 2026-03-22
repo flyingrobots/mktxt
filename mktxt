@@ -27,10 +27,17 @@ if [ ! -d "$CWD" ]; then
   exit 1
 fi
 
-# Get absolute path for the output file
+# Get absolute path for the output file and related sidecars
 OUTPUT_FILE_ABS=$(realpath "$OUTPUT_FILE" 2>/dev/null || echo "$OUTPUT_FILE")
+PREV_FILE="${OUTPUT_FILE_ABS}.prev.txt"
+DIFF_FILE="${OUTPUT_FILE_ABS}.prev.diff.txt"
 
-# Clear or create the output file
+# If the output file already exists, rotate it to .prev.txt
+if [[ -f "$OUTPUT_FILE_ABS" ]]; then
+    mv "$OUTPUT_FILE_ABS" "$PREV_FILE"
+fi
+
+# Clear or create the fresh output file
 > "$OUTPUT_FILE_ABS"
 
 # Track processed files by their canonical absolute path to avoid duplicates/cycles
@@ -39,56 +46,43 @@ VISITED_PATHS="|"
 # Change to target directory
 cd "$CWD" || exit 1
 
-# Process files using NUL byte separation to handle spaces/special chars
+# Process files using NUL byte separation
 process_files() {
     while IFS= read -r -d '' file; do
-        # Resolve absolute canonical path (follows symlinks)
         ABS_FILE=$(realpath "$file" 2>/dev/null)
         
-        # If realpath fails (broken symlink), skip it
         if [[ $? -ne 0 || -z "$ABS_FILE" ]]; then
             continue
         fi
 
-        # Skip the output file itself if it's in the search path
-        if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" ]]; then
+        # Skip the output file and its sidecars
+        if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" || "$ABS_FILE" == "$PREV_FILE" || "$ABS_FILE" == "$DIFF_FILE" ]]; then
             continue
         fi
 
-        # Cycle/Duplicate Detection
         if [[ "$VISITED_PATHS" == *"|$ABS_FILE|"* ]]; then
             continue
         fi
         VISITED_PATHS="${VISITED_PATHS}${ABS_FILE}|"
 
-        # Check if the file is a regular file and non-binary
         if [[ -f "$file" ]] && grep -qI . "$file" 2>/dev/null; then
-            # Calculate metadata
-            # grep -c '^' handles files without trailing newlines correctly
             LINE_COUNT=$(grep -c '^' "$file")
             SIZE=$(wc -c < "$file" | tr -d ' ')
             
-            # Escape filename for JSON (escape backslashes and quotes)
             ESCAPED_PATH=$(echo "$file" | sed 's/\\/\\\\/g; s/"/\\"/g')
-            
-            # Output JSONL for this file
             printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_PATH" "$LINE_COUNT" "$SIZE"
             
-            # Append to aggregate file
             echo "# $file" >> "$OUTPUT_FILE_ABS"
             cat "$file" >> "$OUTPUT_FILE_ABS"
-            # Ensure separation even if file lacks trailing newline
             echo -e "\n" >> "$OUTPUT_FILE_ABS"
         fi
     done
 }
 
-# Get the list of files to process with NUL separation
+# Get the list of files to process
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    # git ls-files -z uses NUL byte termination
     git ls-files -z "$FILTER" | process_files
 else
-    # find -print0 uses NUL byte termination
     find . -type f -name "$FILTER" -not -path '*/.*' -print0 | process_files
 fi
 
@@ -98,4 +92,15 @@ if [[ -f "$OUTPUT_FILE_ABS" ]]; then
     FINAL_SIZE=$(wc -c < "$OUTPUT_FILE_ABS" | tr -d ' ')
     ESCAPED_OUT=$(echo "$OUTPUT_FILE_ABS" | sed 's/\\/\\\\/g; s/"/\\"/g')
     printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_OUT" "$FINAL_LINES" "$FINAL_SIZE"
+fi
+
+# Generate diff if a previous file exists
+if [[ -f "$PREV_FILE" ]]; then
+    # Use unified diff; || true because diff returns 1 if files differ
+    diff -u "$PREV_FILE" "$OUTPUT_FILE_ABS" > "$DIFF_FILE" || true
+    
+    DIFF_LINES=$(grep -c '^' "$DIFF_FILE")
+    DIFF_SIZE=$(wc -c < "$DIFF_FILE" | tr -d ' ')
+    ESCAPED_DIFF=$(echo "$DIFF_FILE" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_DIFF" "$DIFF_LINES" "$DIFF_SIZE"
 fi
