@@ -1,7 +1,10 @@
 #!/bin/bash
 
-# Define the output filename with a timestamp to avoid collisions
-OUTPUT_FILE="mktxt_$(date +%Y%m%d_%H%M%S).txt"
+# Define the output filename
+OUTPUT_FILE="mktxt_aggregate.txt"
+
+# Clear or create the output file
+> "$OUTPUT_FILE"
 
 # Get the list of files to process
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
@@ -9,13 +12,13 @@ if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
     FILES=$(git ls-files)
 else
     # Fallback to find if not in a git repo, excluding hidden directories
-    FILES=$(find . -type f -not -path '*/.*')
+    FILES=$(find . -type f -not -path '*/.*' -not -name "$OUTPUT_FILE")
 fi
 
 # Iterate over each file and append content if it's not binary
 for file in $FILES; do
-    # Skip the output file itself if it was already created (unlikely given timestamp)
-    if [[ "$file" == "./$OUTPUT_FILE" || "$file" == "$OUTPUT_FILE" ]]; then
+    # Skip the output file itself
+    if [[ "$file" == "$OUTPUT_FILE" || "$file" == "./$OUTPUT_FILE" ]]; then
         continue
     fi
 
