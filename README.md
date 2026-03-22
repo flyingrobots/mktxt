@@ -23,4 +23,6 @@ The output will be saved to `mktxt_aggregate.txt` in the directory where you *in
 - Filter files by glob pattern (`filter="*.ext"`).
 - Respects `.gitignore` by using `git ls-files` when inside a Git repository.
 - Excludes binary and empty files automatically.
-- Formats each file with its relative path as a header.
+- **Cycle Detection**: Detects and avoids infinite loops from symlinks and skips duplicate file contents (using canonical paths).
+- **JSONL Output**: Emits JSONL for each file processed and a final summary: \`{"path":"...","lines":...,"size":...}\`.
+- Formats each file in the aggregate with its relative path as a header.

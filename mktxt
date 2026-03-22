@@ -22,45 +22,71 @@ for i in "$@"; do
   esac
 done
 
-# Resolve absolute path for CWD to ensure we can switch back if needed, 
-# or just run commands within it.
 if [ ! -d "$CWD" ]; then
-  echo "Error: Directory '$CWD' does not exist."
+  echo "Error: Directory '$CWD' does not exist." >&2
   exit 1
 fi
 
-# Clear or create the output file in the original working directory
-> "$OUTPUT_FILE"
+# Get the initial directory to ensure we can resolve relative paths for the output file
+INVOCATION_DIR=$(pwd)
+OUTPUT_FILE_ABS=$(realpath "$OUTPUT_FILE" 2>/dev/null || echo "$OUTPUT_FILE")
+
+# Clear or create the output file
+> "$OUTPUT_FILE_ABS"
+
+# Track processed files by their canonical absolute path to avoid duplicates/cycles
+VISITED_PATHS="|"
 
 # Change to target directory
 cd "$CWD" || exit 1
 
 # Get the list of files to process
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    # Use git ls-files with pattern if provided
-    # Note: git ls-files takes patterns directly
     FILES=$(git ls-files "$FILTER")
 else
-    # Fallback to find if not in a git repo
-    # Using -name for the filter
     FILES=$(find . -type f -name "$FILTER" -not -path '*/.*')
 fi
 
 # Iterate over each file and append content if it's not binary
 for file in $FILES; do
-    # Skip the output file itself if it happens to be in the same dir
-    ABS_FILE=$(realpath "$file")
-    if [[ "$ABS_FILE" == "$OUTPUT_FILE" ]]; then
+    # Resolve absolute canonical path (follows symlinks)
+    ABS_FILE=$(realpath "$file" 2>/dev/null)
+    
+    # If realpath fails (broken symlink), skip it
+    if [[ $? -ne 0 || -z "$ABS_FILE" ]]; then
         continue
     fi
 
-    # Check if the file is a regular file and not binary
-    if [[ -f "$file" ]] && grep -qI . "$file"; then
-        echo "# $file" >> "$OUTPUT_FILE"
-        cat "$file" >> "$OUTPUT_FILE"
-        # Ensure there's at least one newline after each file's content
-        echo -e "\n" >> "$OUTPUT_FILE"
+    # Skip the output file itself
+    if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" ]]; then
+        continue
+    fi
+
+    # Check if we've already processed this canonical path
+    if [[ "$VISITED_PATHS" == *"|$ABS_FILE|"* ]]; then
+        continue
+    fi
+    VISITED_PATHS="${VISITED_PATHS}${ABS_FILE}|"
+
+    # Check if the file is a regular file and non-binary
+    if [[ -f "$file" ]] && grep -qI . "$file" 2>/dev/null; then
+        # Calculate metadata
+        LINE_COUNT=$(wc -l < "$file" | tr -d ' ')
+        SIZE=$(wc -c < "$file" | tr -d ' ')
+        
+        # Output JSONL for this file (using relative path as requested)
+        printf '{"path":"%s","lines":%d,"size":%d}\n' "$file" "$LINE_COUNT" "$SIZE"
+        
+        # Append to aggregate file
+        echo "# $file" >> "$OUTPUT_FILE_ABS"
+        cat "$file" >> "$OUTPUT_FILE_ABS"
+        echo -e "\n" >> "$OUTPUT_FILE_ABS"
     fi
 done
 
-echo "Aggregated files from '$CWD' matching '$FILTER' into: $OUTPUT_FILE"
+# Final Summary for the output file
+if [[ -f "$OUTPUT_FILE_ABS" ]]; then
+    FINAL_LINES=$(wc -l < "$OUTPUT_FILE_ABS" | tr -d ' ')
+    FINAL_SIZE=$(wc -c < "$OUTPUT_FILE_ABS" | tr -d ' ')
+    printf '{"path":"%s","lines":%d,"size":%d}\n' "$OUTPUT_FILE_ABS" "$FINAL_LINES" "$FINAL_SIZE"
+fi
