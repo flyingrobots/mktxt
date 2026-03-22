@@ -27,8 +27,7 @@ if [ ! -d "$CWD" ]; then
   exit 1
 fi
 
-# Get the initial directory to ensure we can resolve relative paths for the output file
-INVOCATION_DIR=$(pwd)
+# Get absolute path for the output file
 OUTPUT_FILE_ABS=$(realpath "$OUTPUT_FILE" 2>/dev/null || echo "$OUTPUT_FILE")
 
 # Clear or create the output file
@@ -40,53 +39,63 @@ VISITED_PATHS="|"
 # Change to target directory
 cd "$CWD" || exit 1
 
-# Get the list of files to process
+# Process files using NUL byte separation to handle spaces/special chars
+process_files() {
+    while IFS= read -r -d '' file; do
+        # Resolve absolute canonical path (follows symlinks)
+        ABS_FILE=$(realpath "$file" 2>/dev/null)
+        
+        # If realpath fails (broken symlink), skip it
+        if [[ $? -ne 0 || -z "$ABS_FILE" ]]; then
+            continue
+        fi
+
+        # Skip the output file itself if it's in the search path
+        if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" ]]; then
+            continue
+        fi
+
+        # Cycle/Duplicate Detection
+        if [[ "$VISITED_PATHS" == *"|$ABS_FILE|"* ]]; then
+            continue
+        fi
+        VISITED_PATHS="${VISITED_PATHS}${ABS_FILE}|"
+
+        # Check if the file is a regular file and non-binary
+        if [[ -f "$file" ]] && grep -qI . "$file" 2>/dev/null; then
+            # Calculate metadata
+            # grep -c '^' handles files without trailing newlines correctly
+            LINE_COUNT=$(grep -c '^' "$file")
+            SIZE=$(wc -c < "$file" | tr -d ' ')
+            
+            # Escape filename for JSON (escape backslashes and quotes)
+            ESCAPED_PATH=$(echo "$file" | sed 's/\\/\\\\/g; s/"/\\"/g')
+            
+            # Output JSONL for this file
+            printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_PATH" "$LINE_COUNT" "$SIZE"
+            
+            # Append to aggregate file
+            echo "# $file" >> "$OUTPUT_FILE_ABS"
+            cat "$file" >> "$OUTPUT_FILE_ABS"
+            # Ensure separation even if file lacks trailing newline
+            echo -e "\n" >> "$OUTPUT_FILE_ABS"
+        fi
+    done
+}
+
+# Get the list of files to process with NUL separation
 if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    FILES=$(git ls-files "$FILTER")
+    # git ls-files -z uses NUL byte termination
+    git ls-files -z "$FILTER" | process_files
 else
-    FILES=$(find . -type f -name "$FILTER" -not -path '*/.*')
+    # find -print0 uses NUL byte termination
+    find . -type f -name "$FILTER" -not -path '*/.*' -print0 | process_files
 fi
-
-# Iterate over each file and append content if it's not binary
-for file in $FILES; do
-    # Resolve absolute canonical path (follows symlinks)
-    ABS_FILE=$(realpath "$file" 2>/dev/null)
-    
-    # If realpath fails (broken symlink), skip it
-    if [[ $? -ne 0 || -z "$ABS_FILE" ]]; then
-        continue
-    fi
-
-    # Skip the output file itself
-    if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" ]]; then
-        continue
-    fi
-
-    # Check if we've already processed this canonical path
-    if [[ "$VISITED_PATHS" == *"|$ABS_FILE|"* ]]; then
-        continue
-    fi
-    VISITED_PATHS="${VISITED_PATHS}${ABS_FILE}|"
-
-    # Check if the file is a regular file and non-binary
-    if [[ -f "$file" ]] && grep -qI . "$file" 2>/dev/null; then
-        # Calculate metadata
-        LINE_COUNT=$(wc -l < "$file" | tr -d ' ')
-        SIZE=$(wc -c < "$file" | tr -d ' ')
-        
-        # Output JSONL for this file (using relative path as requested)
-        printf '{"path":"%s","lines":%d,"size":%d}\n' "$file" "$LINE_COUNT" "$SIZE"
-        
-        # Append to aggregate file
-        echo "# $file" >> "$OUTPUT_FILE_ABS"
-        cat "$file" >> "$OUTPUT_FILE_ABS"
-        echo -e "\n" >> "$OUTPUT_FILE_ABS"
-    fi
-done
 
 # Final Summary for the output file
 if [[ -f "$OUTPUT_FILE_ABS" ]]; then
-    FINAL_LINES=$(wc -l < "$OUTPUT_FILE_ABS" | tr -d ' ')
+    FINAL_LINES=$(grep -c '^' "$OUTPUT_FILE_ABS")
     FINAL_SIZE=$(wc -c < "$OUTPUT_FILE_ABS" | tr -d ' ')
-    printf '{"path":"%s","lines":%d,"size":%d}\n' "$OUTPUT_FILE_ABS" "$FINAL_LINES" "$FINAL_SIZE"
+    ESCAPED_OUT=$(echo "$OUTPUT_FILE_ABS" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_OUT" "$FINAL_LINES" "$FINAL_SIZE"
 fi
