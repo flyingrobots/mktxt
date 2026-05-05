@@ -10,8 +10,7 @@ const tsxPath = join(__dirname, 'node_modules', '.bin', 'tsx');
 const indexPath = join(__dirname, 'src', 'index.ts');
 
 const child = spawn(tsxPath, [indexPath, ...process.argv.slice(2)], {
-  stdio: 'inherit',
-  shell: true
+  stdio: 'inherit'
 });
 
 child.on('exit', (code) => {
