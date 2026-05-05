@@ -1,0 +1,22 @@
+{
+  "name": "mktxtx",
+  "version": "1.0.0",
+  "description": "TypeScript rewrite of mktxt using Graft",
+  "type": "module",
+  "bin": {
+    "mktxtx": "./bin/mktxtx.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "start": "tsx src/index.ts",
+    "mktxtx": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@flyingrobots/graft": "file:../graft"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.1",
+    "typescript": "^5.3.3"
+  }
+}

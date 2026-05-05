@@ -1,2 +1,8 @@
 mktxt_aggregate.txt
 mktxt_aggregate.txt*
+node_modules/
+.obsidian/*
+*.txt
+*_toc.md
+*_symbols.csv
+*_diff.txt
