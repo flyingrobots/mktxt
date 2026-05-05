@@ -1,30 +1,50 @@
 #!/bin/bash
 
 # Default values
-CWD="."
-FILTER="*"
+FILTERS=()
+EXTS=()
+DIRS=()
+IGNORE_TESTS="false"
 OUTPUT_FILE="$(pwd)/mktxt_aggregate.txt"
 
-# Simple argument parsing
-for i in "$@"; do
-  case $i in
+# Argument parsing
+while [[ $# -gt 0 ]]; do
+  case $1 in
     --cwd=*)
-      CWD="${i#*=}"
+      DIRS+=("${1#*=}")
       shift
       ;;
-    filter=*)
-      FILTER="${i#*=}"
+    --ext=*)
+      EXTS+=("${1#*=}")
       shift
+      ;;
+    --filter=*|filter=*)
+      FILTERS+=("${1#*=}")
+      shift
+      ;;
+    --no-tests)
+      IGNORE_TESTS="true"
+      shift
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      exit 1
       ;;
     *)
-      # Unknown option
+      DIRS+=("$1")
+      shift
       ;;
   esac
 done
 
-if [ ! -d "$CWD" ]; then
-  echo "Error: Directory '$CWD' does not exist." >&2
-  exit 1
+# If no filters provided, default to "." for pathspecs (match all)
+PATHSPECS=("${FILTERS[@]}")
+if [[ ${#PATHSPECS[@]} -eq 0 ]]; then
+    PATHSPECS=(".")
+fi
+
+if [[ ${#DIRS[@]} -eq 0 ]]; then
+    DIRS=(".")
 fi
 
 # Get absolute path for the output file and related sidecars
@@ -40,15 +60,71 @@ fi
 # Clear or create the fresh output file
 > "$OUTPUT_FILE_ABS"
 
+# Clear or create the fresh TOC file
+OUTPUT_TOC="${OUTPUT_FILE_ABS%.txt}_toc.md"
+echo "| Filepath | Line Start | Line End | Symbols |" > "$OUTPUT_TOC"
+echo "|----------|------------|----------|---------|" >> "$OUTPUT_TOC"
+CURRENT_LINE=0
+
+# Simple symbol extractor using grep
+get_symbols() {
+    local file="$1"
+    case "$file" in
+        *.sh|*.bash|mktxt)
+            grep -E '^[[:space:]]*([a-zA-Z0-9_]+[[:space:]]*\(\)|function [a-zA-Z0-9_]+)' "$file" | sed -E 's/^[[:space:]]*(function )?//; s/[[:space:]]*\(.*//' | tr '\n' ',' | sed 's/,$//; s/,/, /g'
+            ;;
+        *.py)
+            grep -E '^[[:space:]]*(def|class) ' "$file" | sed -E 's/^[[:space:]]*(def|class) ([a-zA-Z0-9_]+).*/\2/' | tr '\n' ',' | sed 's/,$//; s/,/, /g'
+            ;;
+        *.go)
+            grep -E '^[[:space:]]*func ' "$file" | sed -E 's/^[[:space:]]*func (\([^\)]+\) )?([a-zA-Z0-9_]+).*/\2/' | tr '\n' ',' | sed 's/,$//; s/,/, /g'
+            ;;
+        *.js|*.ts|*.jsx|*.tsx)
+            grep -E '^[[:space:]]*(function|class|export (const|let|var|function|class)) [a-zA-Z0-9_]+' "$file" | sed -E 's/^[[:space:]]*(export )?(function|class|const|let|var) ([a-zA-Z0-9_]+).*/\3/' | tr '\n' ',' | sed 's/,$//; s/,/, /g'
+            ;;
+        *.rs)
+            grep -E '^[[:space:]]*(pub )?(fn|struct|enum|trait|type) ' "$file" | sed -E 's/^[[:space:]]*(pub )?(fn|struct|enum|trait|type) ([a-zA-Z0-9_]+).*/\3/' | tr '\n' ',' | sed 's/,$//; s/,/, /g'
+            ;;
+    esac
+}
+
 # Track processed files by their canonical absolute path to avoid duplicates/cycles
 VISITED_PATHS="|"
 
-# Change to target directory
-cd "$CWD" || exit 1
-
 # Process files using NUL byte separation
 process_files() {
+    local prefix="$1"
     while IFS= read -r -d '' file; do
+        # Skip node_modules/
+        case "$file" in
+            node_modules|node_modules/*|*/node_modules|*/node_modules/*)
+                continue
+                ;;
+        esac
+
+        # Skip tests if requested
+        if [[ "$IGNORE_TESTS" == "true" ]]; then
+             case "$file" in
+                *_test.*|*.test.*|*.spec.*|test_*|*/test_*|test.*|*/test.*|*Test.*|*Tests.*|*Spec.*|*_spec.*|test/*|tests/*|*/test/*|*/tests/*|*/__tests__/*|*/__snapshots__/*)
+                    continue
+                    ;;
+            esac
+        fi
+
+        # Strict extension filter
+        if [[ ${#EXTS[@]} -gt 0 ]]; then
+            local matched_ext=false
+            for ext in "${EXTS[@]}"; do
+                if [[ "$file" == *."$ext" ]]; then
+                    matched_ext=true
+                    break
+                fi
+            done
+            if [[ "$matched_ext" == "false" ]]; then
+                continue
+            fi
+        fi
+
         ABS_FILE=$(realpath "$file" 2>/dev/null)
         
         if [[ $? -ne 0 || -z "$ABS_FILE" ]]; then
@@ -56,7 +132,7 @@ process_files() {
         fi
 
         # Skip the output file and its sidecars
-        if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" || "$ABS_FILE" == "$PREV_FILE" || "$ABS_FILE" == "$DIFF_FILE" ]]; then
+        if [[ "$ABS_FILE" == "$OUTPUT_FILE_ABS" || "$ABS_FILE" == "$PREV_FILE" || "$ABS_FILE" == "$DIFF_FILE" || "$ABS_FILE" == "$(realpath "$OUTPUT_TOC" 2>/dev/null)" ]]; then
             continue
         fi
 
@@ -69,22 +145,84 @@ process_files() {
             LINE_COUNT=$(grep -c '^' "$file")
             SIZE=$(wc -c < "$file" | tr -d ' ')
             
-            ESCAPED_PATH=$(echo "$file" | sed 's/\\/\\\\/g; s/"/\\"/g')
+            # Use relative path from the perspective of when we started the command
+            # or just use what find/git gives us but prefixed with the DIR if needed.
+            local display_path="$file"
+            if [[ "$prefix" != "." ]]; then
+                # Remove leading ./ from file if it exists
+                local clean_file="${file#./}"
+                display_path="${prefix%/}/$clean_file"
+            fi
+
+            ESCAPED_PATH=$(echo "$display_path" | sed 's/\\/\\\\/g; s/"/\\"/g')
             printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_PATH" "$LINE_COUNT" "$SIZE"
             
-            echo "# $file" >> "$OUTPUT_FILE_ABS"
+            # TOC entry calculation
+            local header_line=$((CURRENT_LINE + 1))
+            local start_line=$((header_line + 1))
+            local end_line=$((header_line + LINE_COUNT))
+            # Fallback if LINE_COUNT is somehow 0 but grep -qI . matched
+            if [[ "$LINE_COUNT" -eq 0 ]]; then
+                start_line=$header_line
+                end_line=$header_line
+            fi
+            
+            SYMBOLS=$(get_symbols "$file")
+            printf "| %s | %d | %d | %s |\n" "$display_path" "$start_line" "$end_line" "$SYMBOLS" >> "$OUTPUT_TOC"
+            CURRENT_LINE=$((end_line + 2))
+
+            echo "# $display_path" >> "$OUTPUT_FILE_ABS"
             cat "$file" >> "$OUTPUT_FILE_ABS"
             echo -e "\n" >> "$OUTPUT_FILE_ABS"
         fi
     done
 }
 
-# Get the list of files to process
-if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
-    git ls-files -z "$FILTER" | process_files
-else
-    find . -type f -name "$FILTER" -not -path '*/.*' -print0 | process_files
-fi
+INITIAL_PWD=$(pwd)
+
+for DIR in "${DIRS[@]}"; do
+    cd "$INITIAL_PWD" || exit 1
+    if [ ! -d "$DIR" ]; then
+      echo "Warning: Directory '$DIR' does not exist. Skipping." >&2
+      continue
+    fi
+
+    # Skip node_modules/
+    ABS_DIR=$(realpath "$DIR" 2>/dev/null)
+    case "$ABS_DIR" in
+        */node_modules/*|*/node_modules)
+            echo "Warning: Skipping node_modules/ directory: $DIR" >&2
+            continue
+            ;;
+    esac
+
+    cd "$DIR" || continue
+
+    # Get the list of files to process
+    if git rev-parse --is-inside-work-tree > /dev/null 2>&1; then
+        # Include cached and untracked files, respect .gitignore
+        git ls-files -co --exclude-standard -z "${PATHSPECS[@]}" | process_files "$DIR"
+    else
+        # Construct find command with multiple -name patterns
+        # find . -type f \( -name "pattern1" -o -name "pattern2" \) ...
+        FIND_ARGS=("-name" "node_modules" "-prune" "-o" "-type" "f")
+        if [[ ${#PATHSPECS[@]} -gt 1 ]] || [[ "${PATHSPECS[0]}" != "." ]]; then
+            FIND_ARGS+=("(")
+            for i in "${!PATHSPECS[@]}"; do
+                if [[ $i -gt 0 ]]; then
+                    FIND_ARGS+=("-o")
+                fi
+                FIND_ARGS+=("-name" "${PATHSPECS[$i]}")
+            done
+            FIND_ARGS+=(")")
+        fi
+        FIND_ARGS+=("-not" "-path" "*/.*" "-print0")
+        
+        find . "${FIND_ARGS[@]}" | process_files "$DIR"
+    fi
+done
+
+cd "$INITIAL_PWD" || exit 1
 
 # Final Summary for the output file
 if [[ -f "$OUTPUT_FILE_ABS" ]]; then
@@ -92,6 +230,14 @@ if [[ -f "$OUTPUT_FILE_ABS" ]]; then
     FINAL_SIZE=$(wc -c < "$OUTPUT_FILE_ABS" | tr -d ' ')
     ESCAPED_OUT=$(echo "$OUTPUT_FILE_ABS" | sed 's/\\/\\\\/g; s/"/\\"/g')
     printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_OUT" "$FINAL_LINES" "$FINAL_SIZE"
+fi
+
+# Final Summary for the TOC file
+if [[ -f "$OUTPUT_TOC" ]]; then
+    FINAL_LINES=$(grep -c '^' "$OUTPUT_TOC")
+    FINAL_SIZE=$(wc -c < "$OUTPUT_TOC" | tr -d ' ')
+    ESCAPED_TOC=$(echo "$OUTPUT_TOC" | sed 's/\\/\\\\/g; s/"/\\"/g')
+    printf '{"path":"%s","lines":%d,"size":%d}\n' "$ESCAPED_TOC" "$FINAL_LINES" "$FINAL_SIZE"
 fi
 
 # Generate diff if a previous file exists
