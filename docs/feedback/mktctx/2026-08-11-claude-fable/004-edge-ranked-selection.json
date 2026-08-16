@@ -1,0 +1,83 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "claude-fable-2026-08-11-004-edge-ranked-selection",
+  "title": "Use dependency edges for ranked mixed-fidelity selection",
+  "area": "Dependency-aware context selection",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted as deterministic review-profile graph distances from Git-changed paths with explicit projection reasons."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable critique 4: edges enable ranked repositories",
+    "review_target": "Reported 39479-line MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "With edges you can walk from task or touched files, include exact content within N hops, degrade to outline beyond, and omit the rest. That turns a repository into a ranked repository.",
+    "normalized_claim": "Dependency edges should drive deterministic, budget-aware neighborhood selection and per-file fidelity rather than serving only as descriptive metadata."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The edge schema exists but generated packets declare module resolution unavailable.",
+      "Selection is explicit stdin, manifest, positional, or discovery input rather than a graph-ranked expansion from seed files or task entities.",
+      "Exact and numbered projections exist, but there is no outline-only file body projection or graph-distance policy."
+    ],
+    "evidence": [
+      "src/context.ts: @edges rendering and ContentRepresentation",
+      "src/index.ts: input selection handling",
+      "kimi-k3-2026-08-11-007-populated-dependency-edges proposal",
+      "kimi-k3-2026-08-11-011-projection-tier-ladder proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "After edge extraction and projection tiers are credible, define a reproducible graph-ranking policy from declared task or file seeds to a bounded mixed-fidelity packet.",
+    "candidate_changes": [
+      "Declare seed provenance, traversal direction, edge kinds, hop limits, scoring, tie-breaking, and budget stop rules.",
+      "Assign exact, outline, signature, or omitted posture by graph distance and role.",
+      "Emit a selection ledger explaining why each file received its rank and projection.",
+      "Evaluate review and bug-fixing accuracy against explicit-list and non-graph budget selection."
+    ],
+    "non_goals": [
+      "Do not rank from incomplete or low-confidence edges without exposing that posture.",
+      "Do not infer a task from source content when no task or seed was supplied.",
+      "Do not let graph distance erase policy files, tests, or other non-import relevance."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Which edge directions and kinds matter for review versus implementation tasks?",
+      "How are tests, configuration, docs, generated artifacts, and dynamically loaded modules ranked?",
+      "Can task text safely contribute seeds without granting source content instruction authority?"
+    ],
+    "risks": [
+      "Incomplete graphs can systematically omit critical context.",
+      "A single ranking policy may overfit TypeScript import graphs.",
+      "Selection provenance and scoring metadata can consume the savings it creates."
+    ],
+    "evidence_needed": [
+      "Resolved-edge precision and recall measurements.",
+      "Task-success benchmarks across ranking policies and token budgets.",
+      "Counterexamples involving dynamic dependencies, policies, and tests."
+    ],
+    "decision_dependencies": [
+      "kimi-k3-2026-08-11-007-populated-dependency-edges",
+      "kimi-k3-2026-08-11-011-projection-tier-ladder",
+      "claude-fable-2026-08-11-009-token-accounting"
+    ]
+  },
+  "related_items": [
+    "gemini-2026-08-11-002-populated-import-export-edges",
+    "kimi-k3-2026-08-11-007-populated-dependency-edges",
+    "kimi-k3-2026-08-11-011-projection-tier-ladder"
+  ]
+}

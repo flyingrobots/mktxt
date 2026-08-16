@@ -1,0 +1,83 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "grok-2026-08-11-003-selection-reproducibility",
+  "title": "Embed reproducible selection policy and configuration identity",
+  "area": "Selection provenance and reproducibility",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted and completed in MKTCTX/5: normalized caller requests, canonical selection policy, resolved candidates, and outcomes are distinct; replay posture and request SHA-256 use privacy-aware portable paths without shell commands or task text."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Grok",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Grok design observation: selection policy opacity",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "You record reason=selected and selected_complete=false, but the actual selection criteria live outside the packet. Embedding a short machine-readable selection manifest, or a hash of the selection config, would make the packet more self-contained for reproducibility.",
+    "normalized_claim": "Record the concrete selection request or policy identity needed to explain and, where possible, reproduce the packet's working set."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Packets declare selection kind and ordering plus per-file projection reason.",
+      "Canonical manifests include the resulting ordered file records and omissions but not the original path-manifest bytes, Git command, include or exclude filters, or no-tests policy.",
+      "Explicit path inputs may be newline, JSON, or JSONL and canonical duplicates are removed before packaging."
+    ],
+    "evidence": [
+      "src/context.ts: ContextManifest selection and coverage",
+      "src/index.ts: parseArgs and selection construction",
+      "src/manifest.ts: accepted path-manifest inputs",
+      "docs/context-format-v3.md: Header and coverage"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate a canonical selection-request record that distinguishes user request, generator policy, resolved candidates, and final included files.",
+    "candidate_changes": [
+      "Embed canonical explicit requested paths or a hash plus separately available selection manifest.",
+      "Record discovery filters, no-tests policy, Git visibility rule, roots, ordering policy, and generator defaults.",
+      "Distinguish request identity from outcome identity so missing files and environmental drift remain visible.",
+      "Add a reproducibility posture such as exact-request-replayable, policy-replayable, or descriptive-only."
+    ],
+    "non_goals": [
+      "Do not claim that replaying a path list reconstructs old bytes without VCS or content provenance.",
+      "Do not embed sensitive absolute paths or shell commands by default.",
+      "Do not confuse selection configuration hash with packet or source integrity."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "What does reproducibility mean without the original repository revision and ignored files?",
+      "Should raw user input or normalized canonical selection be preserved?",
+      "How are implicit stdin producer commands represented when mktxt cannot observe them?",
+      "Can external and multiple roots be described without leaking machine-specific paths?"
+    ],
+    "risks": [
+      "Selection manifests may expose local paths or task intent.",
+      "A policy hash is unverifiable if the canonical policy serialization is unavailable.",
+      "Environment-dependent discovery can remain non-reproducible despite recording flags."
+    ],
+    "evidence_needed": [
+      "Canonical selection-policy schema and redaction rules.",
+      "Replay tests across explicit manifests, stdin, discovery, filters, missing files, and multiple roots.",
+      "Comparison with VCS provenance requirements for actual byte reproducibility.",
+      "Privacy review for root paths, commands, and selection intent."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics",
+      "chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics",
+    "chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts"
+  ]
+}

@@ -1,0 +1,81 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "kimi-k3-2026-08-11-006-symbol-id-width-grammar",
+  "title": "Define symbol-ID width and stability grammar",
+  "area": "Citation identifiers and grammar",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted and completed in MKTCTX/5: symbol ordinals are canonical minimum-three-digit unbounded decimals, explicitly packet-local to analyzer traversal, with S999/S1000 parent, citation, verifier, sidecar, and generated-fixture coverage."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Kimi",
+    "source_model_version": "K3",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Kimi K3 critique: symbol ID overflow",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "SNNN is 3-wide; a file can exceed 999 symbols. Either use variable width with a declared grammar or SNNNN.",
+    "normalized_claim": "The guide and grammar must say whether symbol ordinals are fixed-width or variable-width and must support files with at least 1000 symbols without ambiguity."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The guide describes symbols as Fxxxxxxxxxxxx:SNNN, which visually implies exactly three digits.",
+      "The generator uses String(index + 1).padStart(3, \"0\"), so ordinal 1000 naturally emits S1000 rather than overflowing or wrapping.",
+      "Symbol IDs are ordinal within the analyzer-provided per-file symbol traversal and can change when earlier symbols are inserted or analyzer ordering changes.",
+      "The formal accepted width and stability scope are not yet normative."
+    ],
+    "evidence": [
+      "src/context.ts: CONTEXT_GUIDE",
+      "src/context.ts: buildContextSymbols symbol ID construction",
+      "src/context.test.ts: duplicate symbol names consume distinct jump-table occurrences"
+    ]
+  },
+  "proposal": {
+    "summary": "Document symbol IDs as a minimum-three-digit, unbounded decimal ordinal or choose another explicit grammar, and state their packet-local stability guarantees.",
+    "candidate_changes": [
+      "Change the guide notation to Sddd+ or another unambiguous variable-width grammar.",
+      "Add tests for S999, S1000, and larger ordinals in records, parent references, edges, and CSV sidecars.",
+      "Document whether symbol IDs are packet-local ordinals, stable under content edits, or stable only for identical analyzer output.",
+      "Specify maximum supported ordinal limits for parsers, if any."
+    ],
+    "non_goals": [
+      "Do not claim that current code fails at symbol 1000; it already emits S1000.",
+      "Do not make ordinal symbol IDs globally durable without separately designing content- or structure-derived identity.",
+      "Do not increase every small symbol ID to a wider fixed width solely for appearance."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Is minimum width useful, or should leading zeros be removed entirely?",
+      "Should durable citations use symbol ordinals, packet identity, content hash, or a combination?",
+      "Do any existing consumers validate exactly three digits?"
+    ],
+    "risks": [
+      "Tightening the grammar may expose incompatible parsers that assumed exactly three digits.",
+      "Variable-width lexical sorting differs from numeric sorting after S999.",
+      "Clarifying packet-local stability may reveal that current citation examples overstate durability."
+    ],
+    "evidence_needed": [
+      "A generated fixture with more than 1000 symbols.",
+      "Consumer parser audit for fixed-width assumptions.",
+      "Citation-stability experiments across insertions and analyzer-version changes."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-004-formal-grammar-and-collision-rules",
+      "chatgpt-2026-08-11-008-packet-versioned-citations"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-004-formal-grammar-and-collision-rules",
+    "chatgpt-2026-08-11-008-packet-versioned-citations"
+  ]
+}

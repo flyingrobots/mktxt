@@ -1,0 +1,95 @@
+{
+  "schema_version": "1.0.0",
+  "collection_id": "claude-fable-mktctx-feedback-2026-08-11",
+  "title": "Claude Fable feedback on MKTCTX/3",
+  "provenance": {
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable feedback",
+    "review_target": "A reported 39479-line, 1.62 MB MKTCTX/3 packet with 161 indexed files; exact artifact not identified"
+  },
+  "review_summary": "review-summary.json",
+  "adjudication": {
+    "status": "complete",
+    "policy": "Review all items together after feedback intake is complete; update each item independently with a decision and rationale.",
+    "accepted_count": 8,
+    "rejected_count": 2,
+    "deferred_count": 2,
+    "pending_count": 0,
+    "superseded_count": 2
+  },
+  "items": [
+    {
+      "id": "claude-fable-2026-08-11-001-symbol-outline-budget-policy",
+      "path": "001-symbol-outline-budget-policy.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-002-packet-defaults-and-attribute-elision",
+      "path": "002-packet-defaults-and-attribute-elision.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-003-symbol-aware-rag-chunks",
+      "path": "003-symbol-aware-rag-chunks.json",
+      "decision": "superseded"
+    },
+    {
+      "id": "claude-fable-2026-08-11-004-edge-ranked-selection",
+      "path": "004-edge-ranked-selection.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-005-model-visible-data-boundary",
+      "path": "005-model-visible-data-boundary.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-006-dual-path-and-content-identities",
+      "path": "006-dual-path-and-content-identities.json",
+      "decision": "rejected"
+    },
+    {
+      "id": "claude-fable-2026-08-11-007-random-access-offsets",
+      "path": "007-random-access-offsets.json",
+      "decision": "rejected"
+    },
+    {
+      "id": "claude-fable-2026-08-11-008-delta-packets",
+      "path": "008-delta-packets.json",
+      "decision": "superseded"
+    },
+    {
+      "id": "claude-fable-2026-08-11-009-token-accounting",
+      "path": "009-token-accounting.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-010-mixed-fidelity-file-projections",
+      "path": "010-mixed-fidelity-file-projections.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-011-per-chunk-digests",
+      "path": "011-per-chunk-digests.json",
+      "decision": "deferred"
+    },
+    {
+      "id": "claude-fable-2026-08-11-012-verification-cli",
+      "path": "012-verification-cli.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-013-spec-extension-and-media-type",
+      "path": "013-spec-extension-and-media-type.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "claude-fable-2026-08-11-014-task-scoped-context-receipts",
+      "path": "014-task-scoped-context-receipts.json",
+      "decision": "deferred"
+    }
+  ]
+}

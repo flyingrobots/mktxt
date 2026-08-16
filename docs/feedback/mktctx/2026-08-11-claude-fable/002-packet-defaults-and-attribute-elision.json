@@ -1,0 +1,81 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "claude-fable-2026-08-11-002-packet-defaults-and-attribute-elision",
+  "title": "Define packet defaults and elide repeated attributes",
+  "area": "Wire efficiency and grammar defaults",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted selectively: default projection, reason, and false export are elided; local trust=data and explicit depth remain."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable critique 2: attribute redundancy",
+    "review_target": "Reported 39479-line MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Define packet-level defaults and only annotate deviations instead of repeating projection=exact reason=selected, trust=data, exported=true, and depth where parent chains already encode it.",
+    "normalized_claim": "Move common values into explicit scoped defaults and omit redundant record attributes when their values remain unambiguous and mechanically reconstructable."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Every file index row emits projection and reason, every exact content and chunk header repeats trust=data, and every symbol emits depth and exported.",
+      "Repeated local trust markers were an intentional response to long-context instruction-boundary decay.",
+      "Depth is derivable from parent links only when the full, valid parent chain is present; exported meaning is analyzer- and language-dependent.",
+      "The format has no normative default declaration or inheritance rules."
+    ],
+    "evidence": [
+      "src/context.ts: renderFileRecord, renderSymbolRecord, and renderExactContent",
+      "docs/design/mktctx-v2.md and MKTCTX/3 examples",
+      "Claude Fable reported repeated-attribute counts"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate explicit, scoped defaults for high-frequency attributes while preserving local trust reinforcement and simple streaming interpretation where those benefits outweigh token savings.",
+    "candidate_changes": [
+      "Define defaults at packet or block scope for projection, selection reason, trust, and other genuinely uniform fields.",
+      "Specify inheritance, override, reset, and unknown-default behavior for streaming consumers.",
+      "Compare retaining trust=data locally against stronger guide wording and chunk byte framing.",
+      "Elide derivable depth or exported fields only where semantics and validation remain clear."
+    ],
+    "non_goals": [
+      "Do not remove local source-as-data signals solely for byte savings without model-safety evaluation.",
+      "Do not make records depend on hidden implementation defaults.",
+      "Do not treat exported=true on config structures as meaningful without defining analyzer semantics."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Which repeated fields dominate tokenizer cost rather than raw bytes?",
+      "Does local trust repetition measurably reduce instruction confusion in long packets?",
+      "Can a consumer validate depth more cheaply when it is explicit than when derived?"
+    ],
+    "risks": [
+      "Inherited defaults increase parser state and make isolated records less self-contained.",
+      "Removing trust markers may weaken model-facing boundaries despite equivalent parser semantics.",
+      "Default changes across versions can silently reinterpret omitted fields."
+    ],
+    "evidence_needed": [
+      "Token-frequency and compressed-size analysis by attribute.",
+      "Prompt-injection evaluations with local versus inherited trust declarations.",
+      "Parser complexity and isolated-record usability comparisons."
+    ],
+    "decision_dependencies": [
+      "claude-fable-2026-08-11-005-model-visible-data-boundary",
+      "kimi-k3-2026-08-11-005-deterministic-canonical-serialization"
+    ]
+  },
+  "related_items": [
+    "gemini-2026-08-11-004-redundant-symbol-signatures",
+    "claude-fable-2026-08-11-005-model-visible-data-boundary"
+  ]
+}

@@ -3,6 +3,7 @@
 # Default values
 FILTERS=()
 EXTS=()
+EXCLUDES=()
 DIRS=()
 IGNORE_TESTS="false"
 OUTPUT_FILE="$(pwd)/mktxt_aggregate.txt"
@@ -20,6 +21,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --filter=*|filter=*)
       FILTERS+=("${1#*=}")
+      shift
+      ;;
+    --exclude=*|--excludes=*)
+      EXCLUDES+=("${1#*=}")
       shift
       ;;
     --no-tests)
@@ -91,6 +96,36 @@ get_symbols() {
 # Track processed files by their canonical absolute path to avoid duplicates/cycles
 VISITED_PATHS="|"
 
+is_excluded_file() {
+    local file="${1#./}"
+    local basename="${file##*/}"
+    local pattern
+
+    for pattern in "${EXCLUDES[@]}"; do
+        local clean_pattern="${pattern#./}"
+
+        # A trailing slash means "exclude this directory recursively".
+        if [[ "$clean_pattern" == */ ]]; then
+            local dir_pattern="${clean_pattern%/}"
+            if [[ "$file" == $dir_pattern || "$file" == $dir_pattern/* ]]; then
+                return 0
+            fi
+            continue
+        fi
+
+        if [[ "$file" == $clean_pattern || "$basename" == $clean_pattern ]]; then
+            return 0
+        fi
+
+        # Treat bare directory names as recursive excludes too.
+        if [[ "$clean_pattern" != */* && "$file" == $clean_pattern/* ]]; then
+            return 0
+        fi
+    done
+
+    return 1
+}
+
 # Process files using NUL byte separation
 process_files() {
     local prefix="$1"
@@ -101,6 +136,10 @@ process_files() {
                 continue
                 ;;
         esac
+
+        if is_excluded_file "$file"; then
+            continue
+        fi
 
         # Skip tests if requested
         if [[ "$IGNORE_TESTS" == "true" ]]; then

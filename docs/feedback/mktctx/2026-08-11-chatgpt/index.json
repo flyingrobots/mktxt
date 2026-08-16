@@ -1,0 +1,65 @@
+{
+  "schema_version": "1.0.0",
+  "collection_id": "chatgpt-mktctx-feedback-2026-08-11",
+  "title": "ChatGPT feedback on MKTCTX/3",
+  "provenance": {
+    "source_name": "ChatGPT",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Feedback from ChatGPT: MKTCTX/3: this is a real format",
+    "review_target": "Reported 6.3 MB, 137715-line MKTCTX/3 packet with 396 files; exact artifact not identified"
+  },
+  "review_summary": "review-summary.json",
+  "adjudication": {
+    "status": "complete",
+    "policy": "Review all items together after feedback intake is complete; update each item independently with a decision and rationale.",
+    "accepted_count": 7,
+    "rejected_count": 0,
+    "deferred_count": 1,
+    "pending_count": 0,
+    "superseded_count": 0
+  },
+  "items": [
+    {
+      "id": "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics",
+      "path": "001-git-provenance-and-diff-semantics.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts",
+      "path": "002-lossless-terminology-and-coverage-counts.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "chatgpt-2026-08-11-003-configurable-missing-file-failure",
+      "path": "003-configurable-missing-file-failure.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "chatgpt-2026-08-11-004-formal-grammar-and-collision-rules",
+      "path": "004-formal-grammar-and-collision-rules.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "chatgpt-2026-08-11-005-whole-packet-integrity",
+      "path": "005-whole-packet-integrity.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "chatgpt-2026-08-11-006-retrieval-roles-and-derived-artifacts",
+      "path": "006-retrieval-roles-and-derived-artifacts.json",
+      "decision": "deferred"
+    },
+    {
+      "id": "chatgpt-2026-08-11-007-context-budget-profiles",
+      "path": "007-context-budget-profiles.json",
+      "decision": "accepted"
+    },
+    {
+      "id": "chatgpt-2026-08-11-008-packet-versioned-citations",
+      "path": "008-packet-versioned-citations.json",
+      "decision": "accepted"
+    }
+  ]
+}

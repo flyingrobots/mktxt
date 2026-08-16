@@ -1,0 +1,81 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "gemini-2026-08-11-003-write-protocol",
+  "title": "Standardize a mutation protocol tied to packet identities",
+  "area": "Agent write-state and mutation application",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "rejected",
+    "implementation": "not-applicable",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Rejected from mktxt's product boundary. MKTCTX packages read context; mature unified-diff and filesystem tools should continue to carry mutations, guarded by exact source hashes where useful. A custom application language would add authority and conflict semantics without demonstrated need."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Gemini",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "GEMINI FEEDBACK item 3 and closing question",
+    "review_target": "MKTCTX/3 read-state protocol"
+  },
+  "feedback": {
+    "verbatim": "Read/Write Boundary Standardization: The format provides an incredibly precise read boundary. It tells the agent exactly what exists. However, if the agent's task is to mutate the code, it needs a corresponding write protocol. If you haven't already, standardizing a diff-application format that references these exact Fxxxx:SNNN IDs would lock the loop together perfectly. Given that this format perfectly describes the read-state of the workspace, how are you currently handling the write-state—does the agent respond with unified diffs, or does it utilize a custom mutation protocol that references your Fxxxx:SNNN symbol IDs directly?",
+    "normalized_claim": "Define an explicit write-state or patch protocol that binds proposed mutations to the packet, file, symbol, line, and content identities used by MKTCTX."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "MKTCTX describes source read-state but does not prescribe how an agent returns or applies edits.",
+      "mktxt can emit a streaming unified diff between previous and current aggregate artifacts, but that is output comparison rather than a mutation-application protocol.",
+      "File records expose stable path IDs and source hashes; symbols expose IDs and source ranges that could serve as optimistic-concurrency preconditions."
+    ],
+    "evidence": [
+      "src/context.ts: ContextPacket, ContextFile, and ContextSymbol",
+      "src/diff.ts: generateUnifiedDiff",
+      "docs/context-format-v3.md: Stable identifiers and exact source chunks",
+      "README.md: sidecar diff behavior"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate a separate, versioned mutation protocol that references MKTCTX packet and file identities while remaining compatible with standard patch tooling.",
+    "candidate_changes": [
+      "Define a patch envelope containing the source packet ID, target file ID and path, expected source SHA-256, operation, and replacement payload.",
+      "Use symbol IDs and line ranges as explanatory anchors while treating file hashes and exact byte ranges as application preconditions.",
+      "Embed or reference unified diffs for interoperability rather than inventing an entirely novel edit language.",
+      "Specify conflict, stale-packet, rename, create, delete, binary, and partial-application behavior.",
+      "Keep read packets and write proposals as separately versioned artifacts with explicit authority boundaries."
+    ],
+    "non_goals": [
+      "Do not treat a proposed mutation artifact as authorization to apply it.",
+      "Do not use symbol IDs alone as mutable addresses when symbol ranges can drift.",
+      "Do not replace existing agent filesystem tools without evidence that an interchange protocol improves safety or accuracy."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Is the intended consumer an LLM response parser, an autonomous mutation tool, a code-review system, or all three?",
+      "Should the write format describe intent, exact byte edits, unified diffs, or a layered combination?",
+      "How are edits authorized separately from their technical validity?",
+      "How should a proposal behave when the workspace no longer matches its packet or source hashes?",
+      "Should creates, deletes, renames, mode changes, and binary replacements be in the first version?"
+    ],
+    "risks": [
+      "A custom patch language may be less reliable than mature unified-diff and filesystem tooling.",
+      "Symbol and line anchors become stale after nearby edits unless guarded by source hashes.",
+      "Combining proposal and application semantics could blur the user's mutation-authorization boundary.",
+      "A write protocol substantially expands mktxt from context packaging into mutation orchestration."
+    ],
+    "evidence_needed": [
+      "Failure analysis of current unified-diff and direct-tool edit workflows.",
+      "Prototype round trips for edits, renames, stale hashes, conflicts, and multi-file atomicity.",
+      "Comparison of application success and token cost for unified diff, structured edit JSON, and a hybrid envelope.",
+      "Threat model covering prompt injection, unauthorized operations, path traversal, and stale workspace state."
+    ],
+    "decision_dependencies": [
+      "Decide whether mktxt's product boundary includes mutation proposals or remains read-context-only."
+    ]
+  }
+}

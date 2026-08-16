@@ -1,0 +1,77 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "grok-2026-08-11-008-name-and-subtitle",
+  "title": "Retain MKTCTX and evaluate a descriptive subtitle",
+  "area": "Format naming and external positioning",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted and completed by retaining MKTCTX and using the domain-neutral subtitle 'a verifiable, budget-aware source-context packet'; lossless, witnessed, and source-truth claims remain avoided."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Grok",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Grok name ideas",
+    "review_target": "MKTCTX format naming"
+  },
+  "feedback": {
+    "verbatim": "Name ideas included MKTCTX, Continuum Context Packet or CCP, Witnessed Context Object or WCO, Exact Context Manifest or ECM, Lossless Agent Context or LAC, and Source Truth Packet or STP. My personal favorite for external use would be MKTCTX as the technical format name, with a human subtitle like 'lossless witnessed context packet.'",
+    "normalized_claim": "Keep the distinctive versioned MKTCTX technical name and consider a human-readable subtitle that communicates fidelity and provenance."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "MKTCTX is the protocol magic, documentation name, fixture prefix, and CLI context-format identity.",
+      "Current documentation describes it as an LLM-oriented source context protocol rather than using a stable subtitle.",
+      "The protocol is not Continuum-specific even though the reviewed packet came from Continuum."
+    ],
+    "evidence": [
+      "src/context.ts: CONTEXT_PROTOCOL",
+      "docs/context-format-v3.md title",
+      "README.md: MKTCTX/3 section",
+      "docs/examples/mktctx-v3-exact.txt"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate retaining MKTCTX unchanged while adopting a precise, domain-neutral subtitle for human communication.",
+    "candidate_changes": [
+      "Keep MKTCTX as the technical and protocol name.",
+      "Evaluate subtitles including lossless witnessed context packet, exact source context packet, and verifiable agent context packet.",
+      "Check trademark, acronym collision, searchability, and whether witnessed overclaims current provenance guarantees.",
+      "Keep Continuum-branded names for products or profiles rather than the portable core format."
+    ],
+    "non_goals": [
+      "Do not rename protocol magic without an overwhelming compatibility reason.",
+      "Do not brand the general format to one repository by accident.",
+      "Do not use source truth language that implies repository completeness."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Does lossless remain misleading while packet scope can be incomplete?",
+      "Does witnessed imply signatures or external attestations not currently present?",
+      "Which subtitle best distinguishes MKTCTX from archives, Git bundles, and RAG corpora?"
+    ],
+    "risks": [
+      "A subtitle can overstate completeness, attestation, or mutation authority.",
+      "Renaming discussions can distract from higher-priority grammar and VCS work.",
+      "Generic acronyms such as CCP, ECM, LAC, and STP have substantial existing collisions."
+    ],
+    "evidence_needed": [
+      "Terminology review against current exactness, integrity, and coverage semantics.",
+      "Search and acronym collision check before external branding.",
+      "Comprehension test with readers unfamiliar with the format."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts",
+      "chatgpt-2026-08-11-005-whole-packet-integrity"
+    ]
+  }
+}

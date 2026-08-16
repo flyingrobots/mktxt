@@ -1,0 +1,81 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "claude-fable-2026-08-11-010-mixed-fidelity-file-projections",
+  "title": "Support mixed-fidelity per-file projections",
+  "area": "Projection semantics and budget control",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted as explicit exact, numbered, signatures, outline, reference, and alias projections."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable feature idea: projection tiers per file",
+    "review_target": "Reported 39479-line MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Add outline, signatures, and elided projections so one packet can serve mixed fidelity under a budget. mode=lossless implies lossy modes exist; specify them.",
+    "normalized_claim": "Let one packet assign exact, structural, signature-only, or identity-only representations per file, with explicit loss and coverage semantics."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The type-level projection vocabulary contains exact, numbered, and alias; numbered is a citation view rather than a smaller semantic summary.",
+      "Global outlines exist even when file bodies are exact, but outline-only or signature-only file projections are not implemented.",
+      "The packet mode is lossless even when repository coverage is incomplete, a terminology issue already captured separately."
+    ],
+    "evidence": [
+      "src/context.ts: ContentRepresentation and renderContextV3",
+      "chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts proposal",
+      "kimi-k3-2026-08-11-011-projection-tier-ladder proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "Treat mixed-fidelity file projections as the concrete wire-level portion of the broader projection-tier and budget-profile design.",
+    "candidate_changes": [
+      "Define exact, numbered, outline, signatures, summary, and elided or reference projections with explicit reconstruction and loss guarantees.",
+      "Require per-file projection reason, source content hash, availability posture, and link to exact authority when applicable.",
+      "Specify alias behavior when canonical and alias paths receive different requested fidelities.",
+      "Test mixed packets with graph-ranked and caller-declared policies."
+    ],
+    "non_goals": [
+      "Do not imply outline or signature projections can reconstruct source bytes.",
+      "Do not overload alias as a lossy projection.",
+      "Do not add model-generated summaries without provenance and authority boundaries."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Which projections belong to the normative core and which are optional analyzer capabilities?",
+      "Can a consumer request or upgrade one file without regenerating the entire packet?",
+      "How are projection-specific hashes and citations defined?"
+    ],
+    "risks": [
+      "Mixed fidelity increases the chance that consumers mistake a summary for exact source.",
+      "Projection-specific identity can complicate aliases and durable citations.",
+      "Too many variants can impair interoperability."
+    ],
+    "evidence_needed": [
+      "Wire examples and round-trip capability tests for every projection.",
+      "Model task evaluations at matched budgets.",
+      "Parser behavior when encountering unsupported projections."
+    ],
+    "decision_dependencies": [
+      "kimi-k3-2026-08-11-011-projection-tier-ladder",
+      "grok-2026-08-11-007-companion-lossy-view"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-007-context-budget-profiles",
+    "grok-2026-08-11-007-companion-lossy-view",
+    "kimi-k3-2026-08-11-011-projection-tier-ladder"
+  ]
+}

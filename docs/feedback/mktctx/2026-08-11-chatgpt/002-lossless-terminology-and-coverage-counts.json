@@ -1,0 +1,78 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts",
+  "title": "Clarify lossless representation versus incomplete scope",
+  "area": "MKTCTX terminology and coverage semantics",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted and completed in MKTCTX/5: representation, projection profile, selection scope, and completeness are orthogonal; normalized requested, included, omitted, alias, and explicitly unknown repository cardinalities are verified."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "ChatGPT",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "ChatGPT MKTCTX/3 feedback item 2",
+    "review_target": "Reported 396-file MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Clarify 'lossless'. This packet says @context mode=lossless while also saying the selection and repository are incomplete. That is logically defensible—lossless for the included files—but easily misread as complete repository. I would change the vocabulary to @context representation=exact scope=explicit-selection and @coverage requested=442 included=396 omitted=46 repository_total=unknown, or call the current mode lossless-selection.",
+    "normalized_claim": "Separate representation fidelity from selection scope, and expose coverage counts so lossless cannot be mistaken for complete-repository coverage."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The context header says mode=lossless while a separate coverage record declares explicit-selection or repository-discovery scope.",
+      "Coverage declares selected_complete and repository_complete but does not state requested, included, omitted, or repository-total counts beyond files and @omitted count.",
+      "The exact projection is lossless for emitted UTF-8 source bodies, while numbered and alias projections have separate semantics."
+    ],
+    "evidence": [
+      "src/context.ts: ContextMode and renderContextV3 header",
+      "src/context.ts: ContextManifest coverage",
+      "docs/context-format-v3.md: Header and coverage",
+      "docs/context-format-v3.md: Exact source chunks"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate orthogonal vocabulary for representation fidelity and selection coverage, with explicit cardinalities and unknown totals.",
+    "candidate_changes": [
+      "Replace mode=lossless with representation=exact for exact packets and keep scope as a separate field.",
+      "Alternatively rename the mode to lossless-selection if retaining the current mode concept.",
+      "Add requested, included, omitted, and repository_total counts, allowing repository_total=unknown.",
+      "Define how duplicate manifest paths, aliases, excluded candidates, and processing failures contribute to each count."
+    ],
+    "non_goals": [
+      "Do not imply repository completeness from exact representation fidelity.",
+      "Do not add counts whose population cannot be defined consistently across manifest, stdin, and discovery selection."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Does mode describe representation, selection policy, budget profile, or a combination that should be decomposed?",
+      "Does requested count include duplicate path requests before canonical deduplication?",
+      "Should aliases count as included files, included bodies, or both through separate fields?",
+      "Can repository_total ever be known when Git ignore rules and external files apply?"
+    ],
+    "risks": [
+      "Renaming a familiar field creates a major format change without necessarily improving model behavior.",
+      "Ambiguous count definitions can be worse than omitted counts.",
+      "Combining fidelity and scope in a new compound term may preserve the original confusion."
+    ],
+    "evidence_needed": [
+      "Blind interpretation tests comparing current and candidate header vocabulary.",
+      "Count invariants and fixtures across explicit manifests, implicit stdin, discovery, duplicates, aliases, exclusions, and failures.",
+      "Compatibility analysis for parsers and generated fixtures."
+    ],
+    "decision_dependencies": []
+  },
+  "related_items": [
+    "grok-2026-08-11-003-selection-reproducibility",
+    "grok-2026-08-11-008-name-and-subtitle"
+  ]
+}

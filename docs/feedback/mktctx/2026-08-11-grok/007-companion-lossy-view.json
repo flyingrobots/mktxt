@@ -1,0 +1,84 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "grok-2026-08-11-007-companion-lossy-view",
+  "title": "Define a cheaper companion view linked to a lossless packet",
+  "area": "Derived model-context views",
+  "state": {
+    "lifecycle": "superseded",
+    "decision": "superseded",
+    "implementation": "not-applicable",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Superseded by MKTCTX/4's explicit review and structure profiles plus signatures, outline, and reference projections. A separate lossy protocol would duplicate those auditable loss semantics."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Grok",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Grok highest-leverage next step: companion view",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Maybe a companion view format that is lossy or summarized for cheaper model context while still pointing back to the lossless packet by hash.",
+    "normalized_claim": "Create a derived, budget-conscious view whose omissions and summaries are auditable against an immutable exact packet identity."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Default packets include exact selected UTF-8 source; numbered is the only alternate implemented content view.",
+      "Balanced, focused, and structure-only modes are reserved but unimplemented.",
+      "Packet and file identities could anchor a separately generated view, but no derived-view relation exists."
+    ],
+    "evidence": [
+      "src/context.ts: ContentRepresentation and packetId",
+      "src/index.ts: parseMode",
+      "docs/context-format-v3.md: packet identity and exact chunks",
+      "README.md: reserved modes"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate a separately identified view artifact that cites a source packet, names its transformation policy, and makes every loss explicit.",
+    "candidate_changes": [
+      "Define source_packet_id and source_manifest_sha256 on every derived view.",
+      "Version the view generator, policy, tokenizer, task intent, and budget independently of the lossless packet.",
+      "Represent summaries, omitted files, omitted ranges, and exact retained chunks with provenance.",
+      "Keep the exact packet retrievable when the view is used for consequential analysis.",
+      "Test whether a separate view format is cleaner than adding lossy projections to MKTCTX core."
+    ],
+    "non_goals": [
+      "Do not describe summarized content as exact source.",
+      "Do not create relevance-based views without explicit intent or policy.",
+      "Do not let the derived view silently become the only retained artifact."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Is the companion a MKTCTX profile, a new protocol, or a retrieval plan over an existing packet?",
+      "How does a consumer retrieve exact omitted evidence?",
+      "What summary provenance and model identity are required?",
+      "Can a view remain reusable if it is generated for a specific task?"
+    ],
+    "risks": [
+      "Lossy views can omit decisive counterevidence.",
+      "Model-generated summaries can introduce claims absent from source.",
+      "A source packet hash is insufficient if the exact packet is unavailable.",
+      "Multiple views add artifact lifecycle and cache complexity."
+    ],
+    "evidence_needed": [
+      "Accuracy and cost evaluations against exact packets for review, query, onboarding, and audit tasks.",
+      "Provenance and retrieval contract for exact backing content.",
+      "Prompt-injection tests for summary generation.",
+      "Comparison of separate-view and in-protocol projection designs."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-007-context-budget-profiles",
+      "chatgpt-2026-08-11-005-whole-packet-integrity"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-007-context-budget-profiles"
+  ]
+}

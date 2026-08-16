@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://mktxt.local/schemas/review-summary-1.0.0.json",
+  "title": "mktxt external-review summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "$schema",
+    "schema_version",
+    "id",
+    "provenance",
+    "reported_validation",
+    "positive_findings",
+    "reviewer_characterization",
+    "reviewer_priority",
+    "verification_posture"
+  ],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "minLength": 1
+    },
+    "schema_version": {
+      "const": "1.0.0"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]+$"
+    },
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_name", "source_model_version", "relayed_by", "received_on", "source_label", "review_target"],
+      "properties": {
+        "source_name": { "type": "string", "minLength": 1 },
+        "source_model_version": { "type": "string", "minLength": 1 },
+        "relayed_by": { "type": "string", "minLength": 1 },
+        "received_on": { "type": "string", "format": "date" },
+        "source_label": { "type": "string", "minLength": 1 },
+        "review_target": { "type": "string", "minLength": 1 }
+      }
+    },
+    "reported_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parser_written_without_additional_explanation", "indexed_files", "exact_files", "alias_files", "claims"],
+      "properties": {
+        "parser_written_without_additional_explanation": { "type": "boolean" },
+        "indexed_files": { "type": "integer", "minimum": 0 },
+        "exact_files": { "type": "integer", "minimum": 0 },
+        "alias_files": { "type": "integer", "minimum": 0 },
+        "claims": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "positive_findings": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "reviewer_characterization": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "reviewer_priority": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verification_posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["independently_reproduced_in_this_intake", "available_evidence", "limitations"],
+      "properties": {
+        "independently_reproduced_in_this_intake": { "type": "boolean" },
+        "available_evidence": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        },
+        "limitations": {
+          "type": "array",
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  }
+}

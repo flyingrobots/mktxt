@@ -1,0 +1,50 @@
+{
+  "$schema": "../../review-summary.schema.json",
+  "schema_version": "1.0.0",
+  "id": "chatgpt-2026-08-11-mktctx-review-summary",
+  "provenance": {
+    "source_name": "ChatGPT",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Feedback from ChatGPT: MKTCTX/3: this is a real format",
+    "review_target": "A reported 6.3 MB, 137715-line MKTCTX/3 packet with 396 indexed files; exact artifact not identified"
+  },
+  "reported_validation": {
+    "parser_written_without_additional_explanation": true,
+    "indexed_files": 396,
+    "exact_files": 370,
+    "alias_files": 26,
+    "claims": [
+      "The reviewer reported reconstructing every indexed file and resolving every alias.",
+      "The reviewer reported that reconstructed bytes, source line counts, and SHA-256 hashes matched for all 370 exact files.",
+      "The reviewer reported that all 26 remaining files were explicit byte-identical aliases.",
+      "The reviewer inferred the path-derived file ID and manifest-derived packet ID algorithms from the packet and reported verifying them."
+    ]
+  },
+  "positive_findings": [
+    "The versioned magic, packet identity, root, file count, generator and analyzer versions, selection semantics, completeness posture, and manifest integrity made the packet self-describing.",
+    "The source-as-data trust boundary was clear and usefully repeated locally on content envelopes and chunks.",
+    "The packet was epistemically honest about incomplete selection, incomplete repository coverage, 46 missing selected paths, and unavailable module edges.",
+    "Path identity, packet identity, and content identity were cleanly separated.",
+    "Explicit byte-identical aliases reduced bytes without collapsing distinct resources.",
+    "Line-oriented controls plus directly readable source avoided JSON escaping noise while retaining machine framing."
+  ],
+  "reviewer_characterization": [
+    "A content-addressed, citation-addressable repository transport format with structural indexes and an explicit LLM trust boundary.",
+    "tar plus ctags plus provenance plus prompt-injection hygiene, designed for model consumption.",
+    "A credible context interchange format rather than merely a repository-pasting convenience."
+  ],
+  "reviewer_priority": "The reviewer recommends prioritizing VCS and diff semantics plus a formal normative grammar before adding another projection feature.",
+  "verification_posture": {
+    "independently_reproduced_in_this_intake": false,
+    "available_evidence": [
+      "The complete review text was relayed by the user.",
+      "The repository contains production renderer, parser, unit tests, and adversarial fixtures for MKTCTX/3."
+    ],
+    "limitations": [
+      "The reviewer's parser source, command transcript, packet bytes, and computed digest report were not supplied.",
+      "The exact reviewed packet was not identified, so the reported 396-file result cannot be reproduced from this intake artifact alone."
+    ]
+  }
+}

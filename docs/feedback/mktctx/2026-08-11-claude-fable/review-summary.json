@@ -1,0 +1,51 @@
+{
+  "$schema": "../../review-summary.schema.json",
+  "schema_version": "1.0.0",
+  "id": "claude-fable-2026-08-11-mktctx-review-summary",
+  "provenance": {
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable feedback",
+    "review_target": "A reported 39479-line, 1.62 MB MKTCTX/3 packet with 161 indexed files; exact artifact not identified"
+  },
+  "reported_validation": {
+    "parser_written_without_additional_explanation": false,
+    "indexed_files": 161,
+    "exact_files": 161,
+    "alias_files": 0,
+    "claims": [
+      "The reviewer reported reading all 39479 lines, reverse-engineering the grammar in one pass, and running measurements.",
+      "The reviewer reported verifying the path-derived file ID algorithm with .continuum/release.yml and inferring the manifest-derived packet ID algorithm.",
+      "The reviewer measured a 362 KB symbols section, 2681 symbol entries, 489 range=unknown entries, 632 content chunks, and 472 chunks of exactly 64 lines.",
+      "The reviewer reported that all 161 index records repeated projection=exact and reason=selected."
+    ]
+  },
+  "positive_findings": [
+    "The packet was understandable without an external specification, and the compact guide taught the citation and trust grammar efficiently.",
+    "Index-first ordering exposed the repository map before source content.",
+    "Path-derived file IDs, symbol IDs, and inclusive line ranges provided a useful grounded citation system.",
+    "Explicit coverage, omissions, and integrity fields made provenance and epistemic limits visible.",
+    "Exact content plus per-file digests made file-level reconstruction verifiable, subject to the repository's unresolved encoding-exactness gap."
+  ],
+  "reviewer_characterization": [
+    "A self-describing, integrity-checked repository projection format for handing selected code to models with stable citations and explicit trust framing.",
+    "A context-layer evidence object rather than merely a repository concatenation format.",
+    "Potential infrastructure for context lockfiles, PR review bundles, reproducible bug reports, verifiable retrieval, and compliance snapshots."
+  ],
+  "reviewer_priority": "Reduce symbol and attribute overhead, populate dependency edges for ranked selection, then add deltas, mixed-fidelity projections, verification tooling, and a concise specification.",
+  "verification_posture": {
+    "independently_reproduced_in_this_intake": false,
+    "available_evidence": [
+      "The complete review and its reported measurements were relayed by the user.",
+      "The repository contains the MKTCTX/3 renderer, parser, tests, adversarial fixture, example packets, and previously captured overlapping review proposals."
+    ],
+    "limitations": [
+      "The reviewed packet and measurement commands were not supplied, so its size and count claims cannot be independently reproduced from this intake alone.",
+      "The exact and alias counts are inferred from the reviewer's statement that all 161 index records carry projection=exact.",
+      "The terminator fixed-point characterization is not the complete collision argument because the generator already scans payload lines and deterministically expands a colliding term.",
+      "The claim of byte-exact losslessness remains subject to the known UTF-8 BOM decoding and hashing mismatch recorded in earlier intake."
+    ]
+  }
+}

@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@flyingrobots/graft':
-        specifier: file:../graft
-        version: file:../graft
+        specifier: 0.11.1
+        version: 0.11.1
     devDependencies:
       '@types/node':
         specifier: ^20.11.0
@@ -246,8 +246,8 @@ packages:
     resolution: {integrity: sha512-vYwFB5lNwp6Lql+WuxHkIzopN11xCLHND0/wPjIlML0J28DZHgvzcpHky9QwSE1NZpTFYAtyBZidwPLYzfVO+Q==}
     engines: {node: '>=18'}
 
-  '@flyingrobots/graft@file:../graft':
-    resolution: {directory: ../graft, type: directory}
+  '@flyingrobots/graft@0.11.1':
+    resolution: {integrity: sha512-TNr7vLkalDw44K9JAigddOIqWWtEXpD8iHspuMhIMh6kQAYie9VsLEcJR6sTSGllJfnURHABhaI0dA5kkZkPjw==}
     engines: {node: '>=20.11.0'}
     hasBin: true
 
@@ -865,6 +865,9 @@ packages:
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
 
+  tree-sitter-graphql-grammar-wasm@1.0.1:
+    resolution: {integrity: sha512-IodB1pYLkxaD/6CzGz7u+gcHm6gC1n41NzJ2JO4B5o+GyjMykWZOGXWRhRsm1oPYz9/igzGwF+x+k9i2eik9CQ==}
+
   tree-sitter-wasms@0.1.13:
     resolution: {integrity: sha512-wT+cR6DwaIz80/vho3AvSF0N4txuNx/5bcRKoXouOfClpxh/qqrF4URNLQXbbt8MaAxeksZcZd1j8gcGjc+QxQ==}
 
@@ -1082,7 +1085,7 @@ snapshots:
 
   '@flyingrobots/bijou@4.4.1': {}
 
-  '@flyingrobots/graft@file:../graft':
+  '@flyingrobots/graft@0.11.1':
     dependencies:
       '@flyingrobots/bijou': 4.4.1
       '@flyingrobots/bijou-node': 4.4.1(@flyingrobots/bijou@4.4.1)
@@ -1090,6 +1093,7 @@ snapshots:
       '@git-stunts/plumbing': 2.8.0
       '@modelcontextprotocol/sdk': 1.29.0(zod@4.3.6)
       picomatch: 4.0.4
+      tree-sitter-graphql-grammar-wasm: 1.0.1
       tree-sitter-wasms: 0.1.13
       web-tree-sitter: 0.20.8
       zod: 4.3.6
@@ -1111,7 +1115,7 @@ snapshots:
       '@git-stunts/plumbing': 2.8.0
       cbor-x: 1.6.4
       commander: 14.0.3
-      zod: 3.24.1
+      zod: 3.25.76
 
   '@git-stunts/git-warp@16.0.0':
     dependencies:
@@ -1779,6 +1783,8 @@ snapshots:
   toidentifier@1.0.1: {}
 
   tr46@0.0.3: {}
+
+  tree-sitter-graphql-grammar-wasm@1.0.1: {}
 
   tree-sitter-wasms@0.1.13: {}
 

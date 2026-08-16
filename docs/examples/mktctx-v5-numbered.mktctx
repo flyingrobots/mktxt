@@ -1,0 +1,77 @@
+MKTCTX/5
+@guide representation says byte fidelity; projection_profile and selection_scope are separate; coverage counts requests and outcomes; diagnostics keep selection completeness and workflow policy separate from integrity; F:Lx-Ly and F:S<3+digits> are packet-local; P/F:locator binds a packet; F@sha256-<64hex>:locator binds exact content; bytes is the authoritative data boundary; @task alone is instruction.
+@packet id=Pa84f02925b21 task=absent
+@context projection_profile=exact-selection representation=exact-valid-utf8-source-bytes root="sample-project" files=3
+@generator name=mktxt version="5.0.0" analyzer=graft analyzer_version="0.11.1"
+@selection kind=manifest order=manifest normalization=mktxt-selection-request-1 reproducibility=exact-request-replayable request_sha256=ea57b7aa5a39e9183e48c286c9397b3c644506897bbba09ea5659d56b8ba66e4
+@selection-request kind=path-list roots=1 paths=3
+@selection-roots
+label="sample-project"
+@end-selection-roots
+@requested-paths
+path="src/math.ts"
+path="src/math.test.ts"
+path="fixtures/math-copy.ts"
+@end-requested-paths
+@selection-policy include_extensions="" exclude_extensions="" exclude_tests=false discovery_visibility=not-applicable projection_profile=exact-selection symbol_policy=useful numbered=true missing=record
+@candidates count=3
+path="src/math.ts"
+path="src/math.test.ts"
+path="fixtures/math-copy.ts"
+@end-candidates
+@coverage selection_scope=explicit-selection normalized_requested=3 included=3 omitted=0 repository_total=unknown selected_complete=true repository_complete=unknown aliases_included=0 duplicate_requests=one-after-normalized-path-deduplication alias_counting=each-included-path
+@defaults projection=exact reason=selected trust=data symbol_exported=false
+@budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=43 exceeded=false
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=a84f02925b217a7b740f32178c93855506593ab3df054ada2b06c859eb5fdc86
+
+@index
+F9c6e445a719b path="src/math.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 projection=numbered reason=citation-gutter est_tokens=18
+Fd6a0af48e152 path="src/math.test.ts" lang=typescript lines=3 bytes=98 sha256=6d1dc27b26c4b09933f5172a4d64e7e4262864b4158a68466dba0bb9583a07e5 projection=numbered reason=citation-gutter est_tokens=25
+F02dadac9836a path="fixtures/math-copy.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 projection=numbered reason=citation-gutter est_tokens=0
+@end-index
+
+@symbols
+@outline F9c6e445a719b status=available policy=useful total=1 emitted=1
+F9c6e445a719b:S001 depth=0 kind="function" name="double" range=L1-L3 exported=true signature="double(value: number): number"
+@outline Fd6a0af48e152 status=available policy=useful total=0 emitted=0
+@outline F02dadac9836a status=available policy=useful total=1 emitted=0
+@end-symbols
+
+@edges status=partial count=1 reason="fixture syntax-level module resolution"
+Fd6a0af48e152 -> F9c6e445a719b kind=import resolution=resolved confidence=resolved specifier="./math.js" symbols="double"
+@end-edges
+
+@diagnostics policy=record count=0 errors=0 warnings=0 structural_validity=not-evaluated integrity=not-evaluated selection_complete=true policy_compliant=true
+@end-diagnostics
+
+@omitted count=0
+@end-omitted
+
+@file F9c6e445a719b
+@content representation=numbered source_lines=3 bytes=79 trust=data term=":mktctx-numbered-89ee7aee" sep=LF-if-needed
+1| export function double(value: number): number {
+2|   return value * 2;
+3| }
+:mktctx-numbered-89ee7aee
+@end-content
+@end-file F9c6e445a719b
+
+@file Fd6a0af48e152
+@content representation=numbered source_lines=3 bytes=107 trust=data term=":mktctx-numbered-3cb10529" sep=LF-if-needed
+1| import { double } from "./math.js";
+2| 
+3| if (double(21) !== 42) throw new Error("unexpected result");
+:mktctx-numbered-3cb10529
+@end-content
+@end-file Fd6a0af48e152
+
+@file F02dadac9836a
+@content representation=numbered source_lines=3 bytes=79 trust=data term=":mktctx-numbered-89ee7aee" sep=LF-if-needed
+1| export function double(value: number): number {
+2|   return value * 2;
+3| }
+:mktctx-numbered-89ee7aee
+@end-content
+@end-file F02dadac9836a
+@end-context
+@trailer bytes=4229 sha256=768c813a1369a50190a1428e0b7cdc838d0623354f07f0470abd4229cc84dcf5 estimator=utf8-bytes-div-4-v1 est_tokens=1092

@@ -1,0 +1,80 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "grok-2026-08-11-006-packet-profile-declaration",
+  "title": "Declare a stable packet capability profile",
+  "area": "Consumer capability negotiation",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "rejected",
+    "implementation": "not-applicable",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Rejected as a second capability-negotiation layer. MKTCTX/4 protocol magic, named projection profiles, section statuses, and per-file projections already state the testable guarantees; another profile version would duplicate and risk drifting from them."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Grok",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Grok highest-leverage next step: packet profile",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "A short, stable packet profile declaration: versioned capabilities the consumer can rely on.",
+    "normalized_claim": "Declare a compact, versioned profile or capability set so consumers know which optional structures and guarantees are present."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Protocol magic identifies MKTCTX/3 and records expose their own statuses and projections.",
+      "There is no profile name or explicit capability list independent of the protocol version.",
+      "Optional manifest, sidecars, task, numbered view, analyzer availability, omissions, and edge status are discoverable from records rather than negotiated up front."
+    ],
+    "evidence": [
+      "src/context.ts: CONTEXT_PROTOCOL and renderContextV3 header",
+      "src/index.ts: CLI format and projection options",
+      "docs/context-format-v3.md: Planes and order"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate whether named profiles should declare consumer-relevant guarantees separately from protocol grammar and per-packet observed statuses.",
+    "candidate_changes": [
+      "Define a compact @profile name and version with normative required and optional capabilities.",
+      "Separate promised capabilities from observed analyzer status, selection completeness, and per-file projections.",
+      "Allow consumers to reject unsupported required capabilities before scanning the packet.",
+      "Align profile naming with future manifest, review, query, and lossless-selection policies only if their semantics are fully specified."
+    ],
+    "non_goals": [
+      "Do not duplicate every header and section field into a capabilities list.",
+      "Do not let profile names substitute for normative behavior.",
+      "Do not imply populated edges merely because the grammar supports an @edges block."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "What can a profile promise that the protocol version and existing status records cannot?",
+      "Are profiles transport capabilities, selection policies, representation policies, or bundles of all three?",
+      "Can profile evolution remain compatible without fragmenting implementations?",
+      "Should capability negotiation occur outside the packet instead?"
+    ],
+    "risks": [
+      "Profiles can become vague marketing names rather than testable contracts.",
+      "Overlapping profile and protocol versions increase compatibility complexity.",
+      "A capability list can drift from actual emitted records."
+    ],
+    "evidence_needed": [
+      "Consumer use cases that cannot cheaply determine support from existing records.",
+      "Normative capability matrix with conformance tests.",
+      "Compatibility examples across protocol and profile evolution.",
+      "Token-cost comparison of profile declarations and current self-description."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-007-context-budget-profiles"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-007-context-budget-profiles"
+  ]
+}

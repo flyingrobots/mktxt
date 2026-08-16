@@ -1,0 +1,126 @@
+digraph accepted_feedback_dag {
+  graph [
+    layout=dot,
+    rankdir=LR,
+    newrank=true,
+    compound=true,
+    splines=polyline,
+    overlap=false,
+    nodesep=0.28,
+    ranksep=0.72,
+    pad=0.25,
+    bgcolor="#FFFFFF",
+    fontname="Helvetica",
+    fontsize=18,
+    labelloc=t,
+    label="Accepted MKTCTX feedback dependency DAG\nSugiyama layered layout via Graphviz dot | green=complete, amber=in progress, blue=planned"
+  ];
+  node [shape=box, style="rounded,filled", fontname="Helvetica", fontsize=10, margin="0.12,0.08", penwidth=1.5];
+  edge [color="#64748B", penwidth=1.15, arrowsize=0.7];
+
+  subgraph cluster_foundations {
+    label="Foundations"; color="#64748B"; fontcolor="#64748B"; style="rounded,dashed"; penwidth=1.1;
+    "US-01" [label="US-01\nPublish a normative grammar\nand edge-case rules\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/004-formal-grammar-and-collision-rules.json", tooltip="chatgpt-2026-08-11-004-formal-grammar-and-collision-rules"];
+    "US-02" [label="US-02\nSpecify encoding, BOM,\nnewline, and byte-count\nsemantics\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/002-encoding-and-normalization.json", tooltip="kimi-k3-2026-08-11-002-encoding-and-normalization"];
+    "US-03" [label="US-03\nMake byte-length framing\nnormative and directive-safe\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/001-length-prefixed-framing.json", tooltip="kimi-k3-2026-08-11-001-length-prefixed-framing"];
+    "US-04" [label="US-04\nSpecify deterministic\ncanonical packet\nserialization\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/005-deterministic-canonical-serialization.json", tooltip="kimi-k3-2026-08-11-005-deterministic-canonical-serialization"];
+  }
+
+  subgraph cluster_provenance_and_selection {
+    label="Provenance and selection"; color="#7C3AED"; fontcolor="#7C3AED"; style="rounded,dashed"; penwidth=1.1;
+    "US-05" [label="US-05\nAdd Git provenance and\nper-file change semantics\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/001-git-provenance-and-diff-semantics.json", tooltip="chatgpt-2026-08-11-001-git-provenance-and-diff-semantics"];
+    "US-06" [label="US-06\nClarify exact representation\nversus incomplete scope\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/002-lossless-terminology-and-coverage-counts.json", tooltip="chatgpt-2026-08-11-002-lossless-terminology-and-coverage-counts"];
+    "US-21" [label="US-21\nEmbed reproducible selection\npolicy and request identity\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-grok/003-selection-reproducibility.json", tooltip="grok-2026-08-11-003-selection-reproducibility"];
+    "US-22" [label="US-22\nMake missing-file policy\nexplicit and configurable\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/003-configurable-missing-file-failure.json", tooltip="chatgpt-2026-08-11-003-configurable-missing-file-failure"];
+  }
+
+  subgraph cluster_repository_graph {
+    label="Repository graph"; color="#0891B2"; fontcolor="#0891B2"; style="rounded,dashed"; penwidth=1.1;
+    "US-07" [label="US-07\nPopulate verified import and\nexport dependency edges\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-gemini/002-populated-import-export-edges.json", tooltip="gemini-2026-08-11-002-populated-import-export-edges"];
+    "US-14" [label="US-14\nPopulate dependency and\nsymbol-reference edges\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/007-populated-dependency-edges.json", tooltip="kimi-k3-2026-08-11-007-populated-dependency-edges"];
+  }
+
+  subgraph cluster_symbol_efficiency {
+    label="Symbol efficiency"; color="#C2410C"; fontcolor="#C2410C"; style="rounded,dashed"; penwidth=1.1;
+    "US-08" [label="US-08\nRemove provably redundant\nsymbol-name tokens\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-gemini/004-redundant-symbol-signatures.json", tooltip="gemini-2026-08-11-004-redundant-symbol-signatures"];
+    "US-09" [label="US-09\nStandardize unavailable\nsymbol-range representation\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/003-range-unavailability-semantics.json", tooltip="kimi-k3-2026-08-11-003-range-unavailability-semantics"];
+    "US-13" [label="US-13\nDefine packet defaults and\nelide repeated attributes\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/002-packet-defaults-and-attribute-elision.json", tooltip="claude-fable-2026-08-11-002-packet-defaults-and-attribute-elision"];
+    "US-20" [label="US-20\nControl symbol-outline cost\nby language, depth, and\nlocation\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/001-symbol-outline-budget-policy.json", tooltip="claude-fable-2026-08-11-001-symbol-outline-budget-policy"];
+  }
+
+  subgraph cluster_trust_boundary {
+    label="Trust boundary"; color="#BE123C"; fontcolor="#BE123C"; style="rounded,dashed"; penwidth=1.1;
+    "US-10" [label="US-10\nMake the model-visible data\nboundary mechanically\nexplicit\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/005-model-visible-data-boundary.json", tooltip="claude-fable-2026-08-11-005-model-visible-data-boundary"];
+  }
+
+  subgraph cluster_integrity_and_verification {
+    label="Integrity and verification"; color="#047857"; fontcolor="#047857"; style="rounded,dashed"; penwidth=1.1;
+    "US-11" [label="US-11\nBind packet completion and\nmanifest integrity scope\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/004-truncation-and-closing-integrity.json", tooltip="kimi-k3-2026-08-11-004-truncation-and-closing-integrity"];
+    "US-12" [label="US-12\nBind rendered packet\nsections with explicit\nintegrity\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/005-whole-packet-integrity.json", tooltip="chatgpt-2026-08-11-005-whole-packet-integrity"];
+    "US-23" [label="US-23\nPublish a normative consumer\nverification procedure\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/012-consumer-verification-procedure.json", tooltip="kimi-k3-2026-08-11-012-consumer-verification-procedure"];
+    "US-24" [label="US-24\nShip a packet verification\nCLI\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/012-verification-cli.json", tooltip="claude-fable-2026-08-11-012-verification-cli"];
+    "US-25" [label="US-25\nPublish specification and\ninteroperability identifiers\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/013-spec-extension-and-media-type.json", tooltip="claude-fable-2026-08-11-013-spec-extension-and-media-type"];
+  }
+
+  subgraph cluster_projection_and_budgeting {
+    label="Projection and budgeting"; color="#2563EB"; fontcolor="#2563EB"; style="rounded,dashed"; penwidth=1.1;
+    "US-15" [label="US-15\nDefine versioned\ncontext-budget profiles\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/007-context-budget-profiles.json", tooltip="chatgpt-2026-08-11-007-context-budget-profiles"];
+    "US-16" [label="US-16\nDefine a projection\ncapability and budget ladder\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/011-projection-tier-ladder.json", tooltip="kimi-k3-2026-08-11-011-projection-tier-ladder"];
+    "US-17" [label="US-17\nSupport mixed-fidelity\nper-file projections\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/010-mixed-fidelity-file-projections.json", tooltip="claude-fable-2026-08-11-010-mixed-fidelity-file-projections"];
+    "US-18" [label="US-18\nDeclare context-cost\nestimates\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/009-token-accounting.json", tooltip="claude-fable-2026-08-11-009-token-accounting"];
+    "US-19" [label="US-19\nUse dependency edges for\nranked mixed-fidelity\nselection\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-claude-fable/004-edge-ranked-selection.json", tooltip="claude-fable-2026-08-11-004-edge-ranked-selection"];
+  }
+
+  subgraph cluster_communication_and_citations {
+    label="Communication and citations"; color="#9333EA"; fontcolor="#9333EA"; style="rounded,dashed"; penwidth=1.1;
+    "US-26" [label="US-26\nMake durable citations\npacket- or content-specific\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-chatgpt/008-packet-versioned-citations.json", tooltip="chatgpt-2026-08-11-008-packet-versioned-citations"];
+    "US-27" [label="US-27\nDefine symbol-ID width and\nstability grammar\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-kimi-k3/006-symbol-id-width-grammar.json", tooltip="kimi-k3-2026-08-11-006-symbol-id-width-grammar"];
+    "US-28" [label="US-28\nRetain MKTCTX with a precise\ndescriptive subtitle\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-grok/008-name-and-subtitle.json", tooltip="grok-2026-08-11-008-name-and-subtitle"];
+    "US-29" [label="US-29\nPublish a verified\nprogressive MKTCTX explainer\n[complete]", fillcolor="#DCFCE7", color="#15803D", URL="2026-08-11-grok/009-companion-explainer-draft.json", tooltip="grok-2026-08-11-009-companion-explainer-draft"];
+  }
+
+  // A -> B means A blocks B.
+  "US-01" -> "US-02";
+  "US-02" -> "US-03";
+  "US-02" -> "US-04";
+  "US-01" -> "US-05";
+  "US-01" -> "US-06";
+  "US-01" -> "US-07";
+  "US-01" -> "US-08";
+  "US-01" -> "US-09";
+  "US-03" -> "US-10";
+  "US-03" -> "US-11";
+  "US-04" -> "US-11";
+  "US-11" -> "US-12";
+  "US-04" -> "US-13";
+  "US-08" -> "US-13";
+  "US-10" -> "US-13";
+  "US-05" -> "US-14";
+  "US-07" -> "US-14";
+  "US-06" -> "US-15";
+  "US-14" -> "US-15";
+  "US-15" -> "US-16";
+  "US-16" -> "US-17";
+  "US-16" -> "US-18";
+  "US-17" -> "US-19";
+  "US-18" -> "US-19";
+  "US-09" -> "US-20";
+  "US-13" -> "US-20";
+  "US-16" -> "US-20";
+  "US-04" -> "US-21";
+  "US-19" -> "US-21";
+  "US-21" -> "US-22";
+  "US-12" -> "US-23";
+  "US-23" -> "US-24";
+  "US-23" -> "US-25";
+  "US-12" -> "US-26";
+  "US-26" -> "US-27";
+  "US-06" -> "US-28";
+  "US-12" -> "US-28";
+  "US-20" -> "US-29";
+  "US-22" -> "US-29";
+  "US-24" -> "US-29";
+  "US-25" -> "US-29";
+  "US-27" -> "US-29";
+  "US-28" -> "US-29";
+}

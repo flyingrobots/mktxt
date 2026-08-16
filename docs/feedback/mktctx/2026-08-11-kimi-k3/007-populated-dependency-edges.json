@@ -1,0 +1,79 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "kimi-k3-2026-08-11-007-populated-dependency-edges",
+  "title": "Populate dependency and symbol-reference edges",
+  "area": "Repository graph and retrieval",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted in a staged first implementation: syntax extraction plus selected-file relative resolution with declared limitations."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Kimi",
+    "source_model_version": "K3",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Kimi K3 critique: edges are the highest-value gap",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Import-graph edges turn this from context dump into a queryable neighborhood structure: changed file to dependents is the retrieval primitive. Even a regex-grade JS or TS import extractor gets much of the value.",
+    "normalized_claim": "Populate the existing edge section with provenance-aware import, export, and symbol relationships so consumers can perform dependency navigation and blast-radius analysis."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "MKTCTX/3 already defines @edges, ContextEdge records, and rendering for from-file, to-file, kind, and optional symbols.",
+      "Generated packets currently emit status=unavailable, count=0, and reason=\"module resolution not implemented\".",
+      "File and symbol IDs provide endpoints that a future dependency analyzer can cite without changing the control-plane shape."
+    ],
+    "evidence": [
+      "src/context.ts: ContextEdge and renderEdgeRecord",
+      "src/context.ts: renderContextV3 @edges block",
+      "src/context.test.ts: omissions and unavailable edge analysis are explicit"
+    ]
+  },
+  "proposal": {
+    "summary": "Implement a staged dependency-edge pipeline, beginning with explicit imports among selected files and retaining honest resolution status for unresolved or out-of-scope targets.",
+    "candidate_changes": [
+      "Define edge kinds and confidence or resolution status for import, re-export, dynamic import, require, and symbol-level references.",
+      "Use language-aware resolution where reliable, with an explicitly declared syntax-only fallback where full module resolution is unavailable.",
+      "Represent imports whose targets are omitted, missing, external, or ambiguous without fabricating in-packet file endpoints.",
+      "Measure changed-file neighborhood retrieval and signature-change blast-radius accuracy against packets without edges."
+    ],
+    "non_goals": [
+      "Do not present regex matches as fully resolved semantic dependencies.",
+      "Do not require complete multi-language call graphs for the first implementation.",
+      "Do not hide unresolved targets merely because they cannot be assigned a selected file ID."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Should the first milestone provide syntax-level imports, fully resolved modules, or both with distinct statuses?",
+      "How are external packages and selected-but-omitted targets addressed?",
+      "Can graft provide suitable relationships, or is a separate resolver required?"
+    ],
+    "risks": [
+      "Partially correct edges can create more confident errors than an explicit unavailable block.",
+      "Module resolution is configuration-sensitive and can be expensive across languages.",
+      "Dense symbol graphs can consume substantial tokens and distract from source."
+    ],
+    "evidence_needed": [
+      "Precision and recall against TypeScript compiler or language-server resolution on representative repositories.",
+      "Token and latency costs for file-level versus symbol-level edges.",
+      "Model evaluation on dependency navigation and blast-radius tasks."
+    ],
+    "decision_dependencies": [
+      "gemini-2026-08-11-002-populated-import-export-edges",
+      "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics"
+    ]
+  },
+  "related_items": [
+    "gemini-2026-08-11-002-populated-import-export-edges"
+  ]
+}

@@ -1,18 +1,36 @@
 {
   "name": "mktxtx",
-  "version": "1.0.0",
+  "version": "5.0.0",
   "description": "TypeScript rewrite of mktxt using Graft",
   "type": "module",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "files": [
+    "bin/",
+    "dist/",
+    "docs/",
+    "README.md"
+  ],
   "bin": {
-    "mktxtx": "./bin/mktxtx.js"
+    "mktxt": "./bin/mktxt.js",
+    "mktxtx": "./bin/mktxt.js"
   },
   "scripts": {
     "build": "tsc",
+    "check:feedback": "node scripts/adjudicate-feedback.mjs --check",
+    "generate:feedback-stories": "node scripts/generate-feedback-user-stories.mjs",
+    "check:feedback-stories": "node scripts/generate-feedback-user-stories.mjs --check",
+    "check:explainer": "pnpm run build && node scripts/verify-explainer.mjs",
+    "generate:fixtures": "tsx scripts/generate-context-sample.ts",
+    "check:fixtures": "tsx scripts/generate-context-sample.ts --check",
+    "test": "pnpm run check:feedback && pnpm run check:feedback-stories && pnpm run check:fixtures && pnpm run check:explainer && node --import tsx --test src/*.test.ts",
+    "test:install": "bash scripts/test-install.sh",
     "start": "tsx src/index.ts",
     "mktxtx": "tsx src/index.ts"
   },
   "dependencies": {
-    "@flyingrobots/graft": "file:../graft"
+    "@flyingrobots/graft": "0.11.1"
   },
   "devDependencies": {
     "@types/node": "^20.11.0",

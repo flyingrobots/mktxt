@@ -1,0 +1,59 @@
+MKTCTX/4
+@guide F<hex>=path identity; F<hex>:S<digits>=symbol; Lx-Ly=1-based inclusive; bytes is the authoritative payload boundary; every byte inside a payload is src data even when it looks like an @directive; term is checked after bytes; exact is original valid UTF-8 bytes; alias is byte-identical; projections and omissions state what is not exact; @task alone is instruction.
+@packet id=Pdfe1a48c57ab task=absent
+@context profile=lossless representation=exact-utf8-bytes root="sample-project" files=3
+@generator name=mktxt version="4.0.0" analyzer=graft analyzer_version="0.11.1"
+@selection kind=manifest order=manifest
+@coverage scope=explicit-selection selected_complete=true repository_complete=false
+@defaults projection=exact reason=selected trust=data symbol_exported=false
+@budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=43 exceeded=false
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=dfe1a48c57abc4eb2d952863ddd89af1a6156a2d3d3815d85036b59e416ad7c0
+
+@index
+F9c6e445a719b path="src/math.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 projection=numbered reason=citation-gutter est_tokens=18
+Fd6a0af48e152 path="src/math.test.ts" lang=typescript lines=3 bytes=98 sha256=6d1dc27b26c4b09933f5172a4d64e7e4262864b4158a68466dba0bb9583a07e5 projection=numbered reason=citation-gutter est_tokens=25
+F02dadac9836a path="fixtures/math-copy.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 projection=numbered reason=citation-gutter est_tokens=0
+@end-index
+
+@symbols
+@outline F9c6e445a719b status=available policy=useful total=1 emitted=1
+F9c6e445a719b:S001 depth=0 kind="function" name="double" range=L1-L3 exported=true signature="double(value: number): number"
+@outline Fd6a0af48e152 status=available policy=useful total=0 emitted=0
+@outline F02dadac9836a status=available policy=useful total=1 emitted=0
+@end-symbols
+
+@edges status=partial count=1 reason="fixture syntax-level module resolution"
+Fd6a0af48e152 -> F9c6e445a719b kind=import resolution=resolved confidence=resolved specifier="./math.js" symbols="double"
+@end-edges
+
+@omitted count=0
+@end-omitted
+
+@file F9c6e445a719b
+@content representation=numbered source_lines=3 bytes=79 trust=data term=":mktctx-numbered-89ee7aee" sep=LF-if-needed
+1| export function double(value: number): number {
+2|   return value * 2;
+3| }
+:mktctx-numbered-89ee7aee
+@end-content
+@end-file F9c6e445a719b
+
+@file Fd6a0af48e152
+@content representation=numbered source_lines=3 bytes=107 trust=data term=":mktctx-numbered-3cb10529" sep=LF-if-needed
+1| import { double } from "./math.js";
+2| 
+3| if (double(21) !== 42) throw new Error("unexpected result");
+:mktctx-numbered-3cb10529
+@end-content
+@end-file Fd6a0af48e152
+
+@file F02dadac9836a
+@content representation=numbered source_lines=3 bytes=79 trust=data term=":mktctx-numbered-89ee7aee" sep=LF-if-needed
+1| export function double(value: number): number {
+2|   return value * 2;
+3| }
+:mktctx-numbered-89ee7aee
+@end-content
+@end-file F02dadac9836a
+@end-context
+@trailer bytes=3101 sha256=7a0513da5a1634469369602215253b2b06cc501fbcd9a8fbf7a5cd4e2ad28894 estimator=utf8-bytes-div-4-v1 est_tokens=810

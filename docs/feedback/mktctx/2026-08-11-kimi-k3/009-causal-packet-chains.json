@@ -1,0 +1,84 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "kimi-k3-2026-08-11-009-causal-packet-chains",
+  "title": "Design causal parent-linked packet chains",
+  "area": "Incremental context and evidence lineage",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "rejected",
+    "implementation": "not-applicable",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Rejected from the core format. Parent chains duplicate Git and CAS history, weaken standalone portability, and make absence, deletion, and garbage collection substantially harder. Compare standalone packets by their existing identities instead."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Kimi",
+    "source_model_version": "K3",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Kimi K3 extension: packet chains",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Emit a parent=P... field referencing a previous manifest hash, with changed files only and hash references for unchanged files. With determinism and parent links, packets become replayable evidence, not just transport.",
+    "normalized_claim": "Define an incremental packet form whose identity commits to a parent packet and whose changed, removed, unchanged, and inherited resources can be deterministically materialized."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Packets are standalone snapshots of an explicit selection and contain no parent pointer or inherited content references.",
+      "Stable path-derived file IDs and per-file content hashes provide useful primitives for comparing two packets.",
+      "Exact aliases deduplicate identical bytes within one packet, but there is no cross-packet delta or materialization protocol.",
+      "The manifest-derived packet ID can serve as a parent reference only after its canonical identity semantics are made normative."
+    ],
+    "evidence": [
+      "src/context.ts: ContextPacket, createContextManifest, applyExactFileAliases, and renderContextV3",
+      "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics proposal",
+      "grok-2026-08-11-005-compression-and-delta-encoding proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "Explore an explicitly incremental profile that binds a parent packet and can reconstruct a new authoritative working set without confusing inherited absence with deletion.",
+    "candidate_changes": [
+      "Define parent packet identity, required parent availability, and chain-verification rules.",
+      "Model added, modified, deleted, renamed, unchanged-by-hash, omitted, and newly unavailable paths distinctly.",
+      "Specify deterministic materialization of a child snapshot and whether chains may branch or merge.",
+      "Compare chained packets with Git-native deltas, content-addressed stores, and standalone lossless-selection packets."
+    ],
+    "non_goals": [
+      "Do not turn MKTCTX into a replacement for Git history, commits, merges, or object negotiation.",
+      "Do not make a child packet appear self-contained when its parent is required.",
+      "Do not use parent links before packet identity and canonical serialization are normative."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Is the primary use case transport compression, conversational continuity, audit evidence, or all three?",
+      "How are missing parents, forks, merges, chain compaction, and garbage collection handled?",
+      "Should inherited file references bind path identity, content identity, parent section identity, or all of them?"
+    ],
+    "risks": [
+      "Chains reduce standalone portability and can become unusable when a parent is missing.",
+      "Incorrect deletion or omission semantics can silently materialize the wrong working set.",
+      "The feature may duplicate Git and CAS capabilities with a less mature protocol."
+    ],
+    "evidence_needed": [
+      "A formal child-materialization algorithm with branch, deletion, omission, and rename test vectors.",
+      "Size and latency measurements across repeated repository snapshots.",
+      "Comparison with Git bundles, thin packs, and external content-addressed stores."
+    ],
+    "decision_dependencies": [
+      "kimi-k3-2026-08-11-005-deterministic-canonical-serialization",
+      "chatgpt-2026-08-11-005-whole-packet-integrity",
+      "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics",
+      "grok-2026-08-11-005-compression-and-delta-encoding"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-001-git-provenance-and-diff-semantics",
+    "chatgpt-2026-08-11-005-whole-packet-integrity",
+    "grok-2026-08-11-005-compression-and-delta-encoding"
+  ]
+}

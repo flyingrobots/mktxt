@@ -1,0 +1,84 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "kimi-k3-2026-08-11-011-projection-tier-ladder",
+  "title": "Define a projection capability and budget ladder",
+  "area": "Context profiles and token budgeting",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted as named profiles, exact/numbered/signatures/outline/reference/alias projections, and explicit loss posture."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Kimi",
+    "source_model_version": "K3",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Kimi K3 extension: projection tiers",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Document a tier ladder such as index-only to symbols to signatures to exact, with a byte or token budget target. That would make the format a default for context engineering.",
+    "normalized_claim": "Define named, capability-explicit packet profiles and projection tiers that trade exactness for navigation and enforce a declared context budget."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "File records declare projection=exact, numbered, or alias, while mode currently describes lossless generation.",
+      "Packets include index, global symbols, edges posture, omissions, and every selected file body by default.",
+      "There is no named capability profile for manifest-only, review, query, summarized, or budget-constrained packets.",
+      "No packet-level token estimate or budget enforcement is implemented."
+    ],
+    "evidence": [
+      "src/context.ts: ContentRepresentation, renderContextV3, and renderFileRecord",
+      "chatgpt-2026-08-11-007-context-budget-profiles proposal",
+      "grok-2026-08-11-006-packet-profile-declaration proposal",
+      "grok-2026-08-11-007-companion-lossy-view proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "Unify profile, projection, and budget proposals into a capability model that makes omissions and loss posture explicit at packet and file level.",
+    "candidate_changes": [
+      "Define stable named profiles and the sections, projection types, completeness claims, and verification guarantees each requires.",
+      "Declare per-file and packet byte or token estimates plus the estimator identity and version.",
+      "Specify deterministic degradation order when a caller sets a budget, including which files remain exact and why.",
+      "Keep every lossy representation linked to exact content identity or a lossless packet when available."
+    ],
+    "non_goals": [
+      "Do not describe summarized or omitted content as lossless.",
+      "Do not make token counts model-independent when tokenizers differ.",
+      "Do not create overlapping profile names without a compact capability declaration consumers can check."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Are profiles presets, conformance levels, or both?",
+      "Which projections are normative core capabilities versus optional extensions?",
+      "How does a budget policy rank changed files, dependencies, tests, policies, generated artifacts, and lockfiles?"
+    ],
+    "risks": [
+      "A tier ladder can falsely imply that more compact tiers preserve the same epistemic guarantees.",
+      "Tokenizer-specific budgets can reduce reproducibility and portability.",
+      "Too many profiles can fragment producers and consumers."
+    ],
+    "evidence_needed": [
+      "Task-accuracy and token-cost benchmarks across candidate profiles.",
+      "Capability negotiation examples for consumers that support only part of the format.",
+      "Deterministic budget-selection tests and explicit omission audits."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-007-context-budget-profiles",
+      "grok-2026-08-11-006-packet-profile-declaration",
+      "grok-2026-08-11-007-companion-lossy-view"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-007-context-budget-profiles",
+    "grok-2026-08-11-006-packet-profile-declaration",
+    "grok-2026-08-11-007-companion-lossy-view"
+  ]
+}

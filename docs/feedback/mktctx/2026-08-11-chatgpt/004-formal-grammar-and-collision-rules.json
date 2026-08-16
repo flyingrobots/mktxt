@@ -1,0 +1,90 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "chatgpt-2026-08-11-004-formal-grammar-and-collision-rules",
+  "title": "Publish a normative grammar and edge-case rules",
+  "area": "MKTCTX formal specification and fuzz robustness",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted as the MKTCTX/4 normative byte, UTF-8, canonicalization, identifier, and framing specification with adversarial fixtures."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "ChatGPT",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "ChatGPT MKTCTX/3 feedback item 4",
+    "review_target": "Reported 396-file MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Add formal grammar and collision behavior. Document how quoted values are escaped; UTF-8 and BOM rules; CRLF handling; files whose paths contain quotes, tabs, or newlines; whether byte length or terminator is authoritative; what happens if a terminator line occurs inside source; path-hash collision handling; whether symbol IDs are stable or packet-relative. Twelve hex digits is 48 bits. Fine for ordinary repository packets, but the generator should detect collisions and either extend to the shortest unique prefix or fail loudly. Also fuzz the parser with source files containing @file, @end-content, @mktctx-whatever, and :mktctx-chunk-1-deadbeef. The source must remain inert data regardless.",
+    "normalized_claim": "Turn the descriptive MKTCTX/3 design into a normative grammar covering encoding, escaping, framing authority, collision handling, identifier stability, and hostile source bytes."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Attribute rendering uses JSON string encoding, but the design document does not define a complete formal grammar for records and attributes.",
+      "Exact chunks use declared UTF-8 byte counts as parser authority and deterministic collision-checked terminator lines as visual framing.",
+      "Path ID prefixes expand symmetrically on a packet-local prefix collision and a full SHA-256 path collision fails.",
+      "The adversarial fixture and tests cover multiple fake protocol records and deterministic terminator expansion.",
+      "Source input is decoded with TextDecoder UTF-8 fatal mode; a direct runtime probe confirms that the default decoder strips an initial UTF-8 BOM while sourceBytes and sourceHash are calculated from the original buffer, so BOM fidelity requires explicit specification and likely correction before an exactness claim covers BOM-bearing files.",
+      "Symbol IDs use stable file IDs plus outline ordinals and therefore can change when outline order changes."
+    ],
+    "evidence": [
+      "src/context.ts: attribute, assignStableFileIds, splitExactChunks, chooseContentTerm, and parseContextContentFrames",
+      "src/index.ts: decodeUtf8 and sourceBuffer hashing",
+      "src/context.test.ts: collision, chunk, and protocol-marker tests",
+      "docs/examples/mktctx-v3-adversarial.txt",
+      "docs/context-format-v3.md: Stable identifiers and exact source chunks",
+      "Runtime probe on 2026-08-11: TextDecoder decoded EF BB BF 61 to one-byte string a"
+    ]
+  },
+  "proposal": {
+    "summary": "Specify a normative lexical and framing grammar, close discovered encoding gaps, and expand property-based parser testing before calling the format independently implementable.",
+    "candidate_changes": [
+      "Define an ABNF, EBNF, or equivalent grammar for magic, records, blocks, identifiers, booleans, integers, JSON-style quoted attributes, arrows, and terminators.",
+      "Declare UTF-8 validity, BOM preservation or rejection, newline preservation, path normalization, and prohibited filesystem names if any.",
+      "State that byte count is machine-authoritative and define the terminator as checked visual framing, including LF-if-needed semantics.",
+      "Normatively specify symmetric shortest-unique path-ID expansion and full-digest collision failure.",
+      "Classify packet, file, and symbol identifier stability across reorder, rename, content change, and outline change.",
+      "Add property-based and mutation fuzzing for arbitrary source, attributes, paths, lengths, terms, and nested fake records."
+    ],
+    "non_goals": [
+      "Do not change framing merely because the current normative description is incomplete.",
+      "Do not claim BOM-bearing exact round trips until the source-buffer and decoded-content identity semantics agree.",
+      "Do not describe outline-ordinal symbol IDs as durable across structural edits."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Should BOM be preserved as source data, rejected, or normalized under a different projection?",
+      "Are attributes exactly JSON strings or only a JSON-compatible quoted subset?",
+      "Is CR without LF a supported source line ending and delimiter predecessor?",
+      "Must paths with newlines be supported even if many downstream tools cannot consume them safely?",
+      "Which parser errors are fatal, and may a parser recover later file blocks after corruption?"
+    ],
+    "risks": [
+      "A normative grammar can expose incompatibilities between currently emitted packets and intended semantics.",
+      "Overly permissive recovery rules could hide corruption.",
+      "Formalizing current behavior without resolving BOM fidelity would codify an exactness defect.",
+      "Property-based fuzzing may uncover changes that require a new protocol version."
+    ],
+    "evidence_needed": [
+      "Independent parser implementations tested against the same conformance corpus.",
+      "Property-based round-trip tests across Unicode, BOM, LF, CRLF, CR, empty files, long lines, and arbitrary protocol-looking source.",
+      "Path fixtures containing quotes, tabs, backslashes, control characters, and newlines where the host filesystem permits them.",
+      "A published set of valid and invalid packets with required parser outcomes."
+    ],
+    "decision_dependencies": []
+  },
+  "related_items": [
+    "gemini-2026-08-11-001-delimiter-collision-risk",
+    "grok-2026-08-11-002-adaptive-and-streaming-chunking",
+    "grok-2026-08-11-009-companion-explainer-draft"
+  ]
+}

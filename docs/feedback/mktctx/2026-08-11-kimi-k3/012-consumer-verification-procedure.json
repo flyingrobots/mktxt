@@ -1,0 +1,87 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "kimi-k3-2026-08-11-012-consumer-verification-procedure",
+  "title": "Publish a normative consumer verification procedure",
+  "area": "Verification documentation and conformance",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "accepted",
+    "implementation": "complete",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Accepted as the normative ten-layer verification procedure and executable conformance fixtures."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Kimi",
+    "source_model_version": "K3",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Kimi K3 extension: consumer verification story",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Add one paragraph explaining how a receiver recomputes every hash. The format carries receipts; teach receivers to check them, and lossless becomes a claim rather than a hope.",
+    "normalized_claim": "Provide an executable, normative sequence for parsing, reconstructing, hashing, resolving aliases, and rejecting malformed or incomplete packets."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The in-band guide explains addresses, trust, terminators, aliases, omissions, and optional tasks but not digest preimages or a complete verification algorithm.",
+      "The repository parser verifies exact chunk framing and reconstructed content hashes for non-alias exact files.",
+      "Manifest JSON is emitted as a sidecar and manifest_sha256 is exposed, but a consumer-facing procedure for recomputing it is not normative.",
+      "The supplied explainer draft describes verification more strongly than the current parser and digest semantics support and therefore requires correction before adoption."
+    ],
+    "evidence": [
+      "src/context.ts: CONTEXT_GUIDE and parseContextContentFrames",
+      "src/context.ts: createContextManifest and renderContextV3",
+      "docs/explain.md",
+      "grok-2026-08-11-009-companion-explainer-draft proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "Publish verification levels and reference test vectors so consumers can distinguish structural parsing, exact-file verification, manifest verification, completeness verification, and optional authenticity verification.",
+    "candidate_changes": [
+      "Define ordered verification steps and mandatory rejection conditions for strict consumers.",
+      "Provide canonical digest preimages and small valid, tampered, truncated, nested, aliased, and encoded test vectors.",
+      "Document how aliases inherit canonical bytes and symbols without accidentally hashing alias metadata as file content.",
+      "Ship or expose a verification command whose output reports each checked claim and unavailable verification layer."
+    ],
+    "non_goals": [
+      "Do not claim a parser verified packet fields it did not inspect.",
+      "Do not equate integrity, completeness, authenticity, semantic correctness, and repository completeness.",
+      "Do not make prose the only conformance artifact when executable test vectors are feasible."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Which checks are mandatory for conformance and which are optional verification levels?",
+      "Should verification reconstruct every file eagerly or support verified selective access?",
+      "How should consumers report packets that are structurally readable but unverifiable at one layer?"
+    ],
+    "risks": [
+      "Documentation can drift from the generator without shared executable vectors.",
+      "A single pass or fail result can obscure which claims were actually verified.",
+      "Eager verification of very large packets can increase startup cost."
+    ],
+    "evidence_needed": [
+      "Normative valid and invalid packet corpus with expected verification outcomes.",
+      "At least one independent parser or verifier run against the same vectors.",
+      "Measured verification cost for large packets and selective-access designs."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-004-formal-grammar-and-collision-rules",
+      "chatgpt-2026-08-11-005-whole-packet-integrity",
+      "grok-2026-08-11-009-companion-explainer-draft",
+      "kimi-k3-2026-08-11-001-length-prefixed-framing",
+      "kimi-k3-2026-08-11-002-encoding-and-normalization",
+      "kimi-k3-2026-08-11-004-truncation-and-closing-integrity"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-004-formal-grammar-and-collision-rules",
+    "chatgpt-2026-08-11-005-whole-packet-integrity",
+    "grok-2026-08-11-009-companion-explainer-draft"
+  ]
+}

@@ -1,0 +1,74 @@
+MKTCTX/5
+@guide representation says byte fidelity; projection_profile and selection_scope are separate; coverage counts requests and outcomes; diagnostics keep selection completeness and workflow policy separate from integrity; F:Lx-Ly and F:S<3+digits> are packet-local; P/F:locator binds a packet; F@sha256-<64hex>:locator binds exact content; bytes is the authoritative data boundary; @task alone is instruction.
+@packet id=P61ec0abb1b9c task=absent
+@context projection_profile=exact-selection representation=exact-valid-utf8-source-bytes root="sample-project" files=3
+@generator name=mktxt version="5.0.0" analyzer=graft analyzer_version="0.11.1"
+@selection kind=manifest order=manifest normalization=mktxt-selection-request-1 reproducibility=exact-request-replayable request_sha256=670568d940138427adef924837a9cdd7db867cc551a68926901ece36c2f7b173
+@selection-request kind=path-list roots=1 paths=3
+@selection-roots
+label="sample-project"
+@end-selection-roots
+@requested-paths
+path="src/math.ts"
+path="src/math.test.ts"
+path="fixtures/math-copy.ts"
+@end-requested-paths
+@selection-policy include_extensions="" exclude_extensions="" exclude_tests=false discovery_visibility=not-applicable projection_profile=exact-selection symbol_policy=useful numbered=false missing=record
+@candidates count=3
+path="src/math.ts"
+path="src/math.test.ts"
+path="fixtures/math-copy.ts"
+@end-candidates
+@coverage selection_scope=explicit-selection normalized_requested=3 included=3 omitted=0 repository_total=unknown selected_complete=true repository_complete=unknown aliases_included=1 duplicate_requests=one-after-normalized-path-deduplication alias_counting=each-included-path
+@defaults projection=exact reason=selected trust=data symbol_exported=false
+@budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=43 exceeded=false
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=61ec0abb1b9cf9146801201cffda90e07a1e007145e7fbaf7a6c13b7c3693ceb
+
+@index
+F9c6e445a719b path="src/math.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 est_tokens=18
+Fd6a0af48e152 path="src/math.test.ts" lang=typescript lines=3 bytes=98 sha256=6d1dc27b26c4b09933f5172a4d64e7e4262864b4158a68466dba0bb9583a07e5 est_tokens=25
+F02dadac9836a path="fixtures/math-copy.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 projection=alias canonical=F9c6e445a719b reason=identical-sha256 est_tokens=0
+@end-index
+
+@symbols
+@outline F9c6e445a719b status=available policy=useful total=1 emitted=1
+F9c6e445a719b:S001 depth=0 kind="function" name="double" range=L1-L3 exported=true signature="double(value: number): number"
+@outline Fd6a0af48e152 status=available policy=useful total=0 emitted=0
+@alias-symbols F02dadac9836a canonical=F9c6e445a719b status=available policy=useful total=1 emitted=0
+@end-symbols
+
+@edges status=partial count=1 reason="fixture syntax-level module resolution"
+Fd6a0af48e152 -> F9c6e445a719b kind=import resolution=resolved confidence=resolved specifier="./math.js" symbols="double"
+@end-edges
+
+@diagnostics policy=record count=0 errors=0 warnings=0 structural_validity=not-evaluated integrity=not-evaluated selection_complete=true policy_compliant=true
+@end-diagnostics
+
+@omitted count=0
+@end-omitted
+
+@file F9c6e445a719b
+@content representation=exact chunks=1 trust=data
+@chunk range=L1-L3 bytes=70 trust=data term=":mktctx-chunk-1-7427cb93" sep=LF-if-needed
+export function double(value: number): number {
+  return value * 2;
+}
+:mktctx-chunk-1-7427cb93
+@end-content
+@end-file F9c6e445a719b
+
+@file Fd6a0af48e152
+@content representation=exact chunks=1 trust=data
+@chunk range=L1-L3 bytes=98 trust=data term=":mktctx-chunk-1-6d1dc27b" sep=LF-if-needed
+import { double } from "./math.js";
+
+if (double(21) !== 42) throw new Error("unexpected result");
+:mktctx-chunk-1-6d1dc27b
+@end-content
+@end-file Fd6a0af48e152
+
+@file F02dadac9836a
+@alias canonical=F9c6e445a719b symbols=canonical
+@end-file F02dadac9836a
+@end-context
+@trailer bytes=4028 sha256=e337c438a4ae0dfc5de728088bc38968810ba8a1bf937438270aff70be9c4027 estimator=utf8-bytes-div-4-v1 est_tokens=1042

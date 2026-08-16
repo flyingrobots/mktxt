@@ -1,0 +1,81 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "claude-fable-2026-08-11-007-random-access-offsets",
+  "title": "Add byte-offset indexing for random file access",
+  "area": "Packet indexing and seekability",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "rejected",
+    "implementation": "not-applicable",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Rejected absent a measured seek bottleneck. A consumer can build an offset map during one strict parse; in-band offsets add model-irrelevant entropy and serialization feedback, while a future tool-owned sidecar needs no core protocol change."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable critique 7: no random access",
+    "review_target": "Reported 39479-line MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Add offset= per index entry so a tool can seek directly to any file without parsing the entire packet and the index becomes a true table of contents.",
+    "normalized_claim": "Index records should optionally identify exact serialized byte spans so seekable consumers can retrieve file bodies without scanning preceding content."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The index records source byte counts and line counts but not serialized packet offsets or body lengths.",
+      "The reference parser scans for each @file marker in manifest order, then consumes exact chunk byte counts.",
+      "Offsets depend on canonical packet encoding and exact prefix serialization, and putting variable-width offsets in the leading index creates a length-feedback problem that needs a deterministic layout or fixed-point algorithm.",
+      "Sidecar manifests could carry offsets without changing the in-band index prefix."
+    ],
+    "evidence": [
+      "src/context.ts: renderFileRecord and parseContextContentFrames",
+      "src/context.ts: renderContextV3 ordering",
+      "kimi-k3-2026-08-11-005-deterministic-canonical-serialization proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate an optional seek table, either in-band with a canonical offset-width strategy or as a bound sidecar or trailer, using UTF-8 byte offsets into exact packet bytes.",
+    "candidate_changes": [
+      "Define offset origin, addressed marker, length, encoding, and whether aliases have bodies.",
+      "Compare leading fixed-width offsets, a trailing seek table, and manifest-sidecar offsets.",
+      "Bind the seek table to packet identity so stale offsets are detectable.",
+      "Add direct-seek tests for multibyte text, CRLF, aliases, numbered projections, and large packets."
+    ],
+    "non_goals": [
+      "Do not call source bytes an offset into the serialized packet.",
+      "Do not add offsets before canonical encoding and serialization are defined.",
+      "Do not require random-access metadata in model-only profiles where it adds cost without utility."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Should offsets point to @file, @content, first payload byte, or a complete file span?",
+      "Is a trailing or sidecar table acceptable for consumers that want index-first navigation?",
+      "What packet sizes make seek offsets faster than one linear parse plus an in-memory map?"
+    ],
+    "risks": [
+      "Line-ending conversion or transcoding invalidates offsets.",
+      "In-band offset width can create unstable self-referential index lengths.",
+      "Offsets add maximum-entropy numbers that models do not need."
+    ],
+    "evidence_needed": [
+      "Seek latency benchmarks by packet size and storage medium.",
+      "Canonical layout prototypes for leading, trailing, and sidecar tables.",
+      "Tampered and stale offset-table rejection tests."
+    ],
+    "decision_dependencies": [
+      "kimi-k3-2026-08-11-005-deterministic-canonical-serialization",
+      "kimi-k3-2026-08-11-004-truncation-and-closing-integrity"
+    ]
+  },
+  "related_items": [
+    "kimi-k3-2026-08-11-005-deterministic-canonical-serialization",
+    "chatgpt-2026-08-11-005-whole-packet-integrity"
+  ]
+}

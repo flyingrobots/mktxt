@@ -1,0 +1,80 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "claude-fable-2026-08-11-008-delta-packets",
+  "title": "Define delta packets for iterative context sessions",
+  "area": "Incremental transport and context history",
+  "state": {
+    "lifecycle": "superseded",
+    "decision": "superseded",
+    "implementation": "not-applicable",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Superseded by the broader causal-chain and differential-transport proposals, which were rejected for the core format. Iterative sessions should exchange standalone packets or use external Git/CAS transport."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Claude",
+    "source_model_version": "Fable",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Claude Fable feature idea: delta packets",
+    "review_target": "Reported 39479-line MKTCTX/3 packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "Use @packet base=P... plus only changed, added, and removed files so iterative agent sessions do not pay full freight every turn and a chain records what the agent saw.",
+    "normalized_claim": "Add a parent-bound delta profile that represents repository-context changes compactly and materializes a verifiable successor working set."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "Every packet is a standalone selected snapshot with no base identity or inherited state.",
+      "Path-derived IDs, file hashes, omissions, and packet IDs provide primitives for computing differences but no delta grammar.",
+      "This proposal substantially overlaps Kimi's causal packet chain and Grok's delta-encoding proposals."
+    ],
+    "evidence": [
+      "src/context.ts: ContextPacket and renderContextV3",
+      "kimi-k3-2026-08-11-009-causal-packet-chains proposal",
+      "grok-2026-08-11-005-compression-and-delta-encoding proposal"
+    ]
+  },
+  "proposal": {
+    "summary": "Treat Claude's conversation-oriented delta use case as evidence for the causal-chain proposal and evaluate a minimal base-plus-change profile before designing general history semantics.",
+    "candidate_changes": [
+      "Declare base packet identity and added, modified, removed, renamed, inherited, and omission changes.",
+      "Define materialization and verification against a required base packet.",
+      "Measure iterative-session bandwidth and token savings while retaining periodic standalone checkpoints.",
+      "Record whether an agent received a standalone snapshot, a delta, or a fully materialized chain."
+    ],
+    "non_goals": [
+      "Do not duplicate the full causal-chain proposal as an unrelated feature.",
+      "Do not make deltas independently complete when their base is required.",
+      "Do not assume transport savings equal prompt-token savings unless the consumer can retain or retrieve base context."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Can the target model or agent reliably retain a base packet between turns?",
+      "How often should a chain be compacted into a standalone checkpoint?",
+      "Does a delta carry changed final files, diffs, or both?"
+    ],
+    "risks": [
+      "Context-window consumers may need the base resent, eliminating token savings.",
+      "Long chains make reproducibility depend on every intermediate artifact.",
+      "Deletion and omission semantics can be confused."
+    ],
+    "evidence_needed": [
+      "Conversation replay experiments with and without retained base context.",
+      "Materialization test vectors and chain compaction measurements.",
+      "Comparison of exact replacement bodies versus textual diffs."
+    ],
+    "decision_dependencies": [
+      "kimi-k3-2026-08-11-009-causal-packet-chains",
+      "grok-2026-08-11-005-compression-and-delta-encoding"
+    ]
+  },
+  "related_items": [
+    "kimi-k3-2026-08-11-009-causal-packet-chains",
+    "grok-2026-08-11-005-compression-and-delta-encoding"
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "$schema": "../../feedback-item.schema.json",
+  "schema_version": "1.0.0",
+  "id": "grok-2026-08-11-001-human-facing-summary",
+  "title": "Add a compact human-facing packet summary",
+  "area": "Human navigation and cold-open readability",
+  "state": {
+    "lifecycle": "adjudicated",
+    "decision": "deferred",
+    "implementation": "not-started",
+    "decided_on": "2026-08-12",
+    "decided_by": "James and Codex",
+    "decision_rationale": "Deferred until role metadata and cold-open tests show a deterministic summary improves navigation enough to justify duplicated packet tokens. Narrative summaries remain outside the authoritative core."
+  },
+  "provenance": {
+    "source_type": "external-model-feedback",
+    "source_name": "Grok",
+    "source_model_version": "unknown",
+    "relayed_by": "James via Codex chat",
+    "received_on": "2026-08-11",
+    "source_label": "Grok design observation: density versus readability",
+    "review_target": "MKTCTX/3 Continuum packet; exact artifact not identified"
+  },
+  "feedback": {
+    "verbatim": "The format is extremely information-dense. That's a feature for machines, but the index plus outlines plus multi-chunk files make human skimming heavier than a simple tarball plus README. A small human-facing summary header, or a generated table of contents with one-sentence role per file, would help when a person has to open the packet cold.",
+    "normalized_claim": "Provide a compact, trustworthy orientation layer for human readers without weakening or duplicating the machine-oriented index."
+  },
+  "repository_context": {
+    "observed_version": "mktxt 3.0.0 / MKTCTX/3 worktree",
+    "current_behavior": [
+      "The packet begins with a one-line guide and machine-oriented metadata, index, global symbols, edges, and omissions.",
+      "An optional TOC sidecar lists file IDs, paths, projections, line counts, and symbol counts but does not contain one-sentence roles.",
+      "No generated narrative summary is embedded in the packet."
+    ],
+    "evidence": [
+      "src/context.ts: CONTEXT_GUIDE and renderContextV3",
+      "src/context.ts: renderContextToc",
+      "docs/examples/mktctx-v3-exact.txt"
+    ]
+  },
+  "proposal": {
+    "summary": "Evaluate a short human-facing summary or role-oriented TOC that remains clearly derived and non-authoritative.",
+    "candidate_changes": [
+      "Add a deterministic summary block containing counts, major directories, languages, roles, and notable omissions without generated prose.",
+      "Extend an optional sidecar with caller-supplied or provenance-backed one-sentence file roles.",
+      "Keep narrative model-generated summaries outside the integrity-critical core unless their generator and evidence are declared.",
+      "Test whether humans and models orient faster with the summary than with the existing index alone."
+    ],
+    "non_goals": [
+      "Do not treat generated prose as repository truth.",
+      "Do not duplicate hundreds of index rows in a second embedded table.",
+      "Do not increase the default packet materially without measured navigation benefit."
+    ]
+  },
+  "evaluation": {
+    "questions": [
+      "Is the summary intended for humans, models, or both?",
+      "Can useful one-sentence roles be derived deterministically, or must they come from the selection manifest?",
+      "Should the summary be embedded, a sidecar, or a separate view?"
+    ],
+    "risks": [
+      "Narrative summaries can be stale, lossy, or confidently wrong.",
+      "A second navigation layer may duplicate tokens without changing behavior.",
+      "Human-oriented ordering can conflict with deterministic machine ordering."
+    ],
+    "evidence_needed": [
+      "Timed cold-open navigation tests with humans and models.",
+      "Token-cost measurements for deterministic and narrative summary designs.",
+      "Provenance rules for any caller-supplied or generated role descriptions."
+    ],
+    "decision_dependencies": [
+      "chatgpt-2026-08-11-006-retrieval-roles-and-derived-artifacts"
+    ]
+  },
+  "related_items": [
+    "chatgpt-2026-08-11-006-retrieval-roles-and-derived-artifacts"
+  ]
+}
