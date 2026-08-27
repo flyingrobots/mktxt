@@ -35,10 +35,13 @@
     "test": "pnpm run check:fixtures && pnpm run check:explainer && node --import tsx --test src/*.test.ts",
     "test:install": "bash scripts/test-install.sh",
     "start": "tsx src/index.ts",
-    "mktxtx": "tsx src/index.ts"
+    "mktxtx": "tsx src/index.ts",
+    "mcp": "tsx src/mcp-server.ts"
   },
   "dependencies": {
-    "@flyingrobots/graft": "0.11.1"
+    "@flyingrobots/graft": "0.11.1",
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.4.3"
   },
   "devDependencies": {
     "@types/node": "^20.19.43",
