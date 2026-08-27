@@ -2,7 +2,18 @@
   "name": "mktxtx",
   "version": "5.0.0",
   "description": "TypeScript rewrite of mktxt using Graft",
+  "author": "James Ross <james@flyingrobots.dev>",
+  "keywords": [
+    "mktxt",
+    "mktxtx",
+    "aggregate",
+    "context",
+    "ast",
+    "graft"
+  ],
   "type": "module",
+  "main": "./dist/index.js",
+  "exports": "./dist/index.js",
   "engines": {
     "node": ">=20.11.0"
   },
