@@ -9,3 +9,4 @@ node_modules/
 *_symbols.csv
 *_diff.txt
 dist/
+.geminiignore
