@@ -1,6 +1,9 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { execFileSync } from "node:child_process";
+import { execFile, execFileSync } from "node:child_process";
+import { promisify } from "node:util";
+
+const execFileAsync = promisify(execFile);
 import {
   applyExactFileAliases,
   assignStableFileIds,
@@ -553,123 +556,137 @@ async function collectContextFiles(args: {
         console.warn(`Warning: Could not initialize Graft in ${absoluteCwd}: ${errorMessage(error)}`);
       }
     }
-    for (const selectedFile of selectedFiles) {
-      if (processedFiles.has(selectedFile.displayPath)) continue;
-      processedFiles.add(selectedFile.displayPath);
-      resolvedCandidates.push(selectedFile.displayPath);
-      const extension = normalizeExt(path.extname(selectedFile.displayPath));
-      if (args.options.noTests && isTestFile(selectedFile.displayPath)) {
-        handleSelectionOmission(omissions, {
-          path: selectedFile.displayPath,
-          reason: "excluded-test",
-          detail: "excluded by --no-tests",
-        }, args.missingPolicy);
-        continue;
-      }
-      if (args.options.includeExts.size > 0 && !args.options.includeExts.has(extension)) {
-        handleSelectionOmission(omissions, {
-          path: selectedFile.displayPath,
-          reason: "excluded-extension",
-          detail: "not included by --include-ext",
-        }, args.missingPolicy);
-        continue;
-      }
-      if (args.options.excludeExts.has(extension)) {
-        handleSelectionOmission(omissions, {
-          path: selectedFile.displayPath,
-          reason: "excluded-extension",
-          detail: "explicitly excluded by --exclude-ext",
-        }, args.missingPolicy);
-        continue;
-      }
-      if (resolvedOutputs.has(path.resolve(selectedFile.fullPath))) {
-        handleSelectionOmission(omissions, {
-          path: selectedFile.displayPath,
-          reason: "output-file",
-          detail: "candidate is an output path",
-        }, args.missingPolicy);
-        continue;
-      }
+    // Process files in chunks to bound concurrency and avoid EMFILE
+    const chunkedFiles = [];
+    for (let i = 0; i < selectedFiles.length; i += 8) {
+      chunkedFiles.push(selectedFiles.slice(i, i + 8));
+    }
 
-      try {
-        let sourceBuffer = await fs.readFile(selectedFile.fullPath);
-        if (sourceBuffer.includes(0)) {
-          let converted = false;
-          if (selectedFile.displayPath.toLowerCase().endsWith(".pdf")) {
+    for (const chunk of chunkedFiles) {
+      const chunkResults = await Promise.all(chunk.map(async (selectedFile) => {
+        if (processedFiles.has(selectedFile.displayPath)) return null;
+        processedFiles.add(selectedFile.displayPath);
+        resolvedCandidates.push(selectedFile.displayPath);
+        const extension = normalizeExt(path.extname(selectedFile.displayPath));
+        if (args.options.noTests && isTestFile(selectedFile.displayPath)) {
+          handleSelectionOmission(omissions, {
+            path: selectedFile.displayPath,
+            reason: "excluded-test",
+            detail: "excluded by --no-tests",
+          }, args.missingPolicy);
+          return null;
+        }
+        if (args.options.includeExts.size > 0 && !args.options.includeExts.has(extension)) {
+          handleSelectionOmission(omissions, {
+            path: selectedFile.displayPath,
+            reason: "excluded-extension",
+            detail: "not included by --include-ext",
+          }, args.missingPolicy);
+          return null;
+        }
+        if (args.options.excludeExts.has(extension)) {
+          handleSelectionOmission(omissions, {
+            path: selectedFile.displayPath,
+            reason: "excluded-extension",
+            detail: "explicitly excluded by --exclude-ext",
+          }, args.missingPolicy);
+          return null;
+        }
+        if (resolvedOutputs.has(path.resolve(selectedFile.fullPath))) {
+          handleSelectionOmission(omissions, {
+            path: selectedFile.displayPath,
+            reason: "output-file",
+            detail: "candidate is an output path",
+          }, args.missingPolicy);
+          return null;
+        }
+
+        try {
+          let sourceBuffer = await fs.readFile(selectedFile.fullPath);
+          if (sourceBuffer.includes(0)) {
+            let converted = false;
+            if (selectedFile.displayPath.toLowerCase().endsWith(".pdf")) {
+              try {
+                // Convert PDF to text via stdout to avoid temporary files
+                const { stdout } = await execFileAsync("pdftotext", [selectedFile.fullPath, "-"], { maxBuffer: 1024 * 1024 * 50, encoding: "buffer" });
+                sourceBuffer = stdout;
+                converted = true;
+              } catch (err) {
+                // Fall through to binary error if pdftotext is missing or fails
+              }
+            }
+            if (!converted) {
+              throw new Error(`Selected file is binary: ${selectedFile.displayPath}`);
+            }
+          }
+          const content = decodeUtf8(sourceBuffer, selectedFile.displayPath);
+          let outlineStatus: ContextFile["outlineStatus"] = "unavailable";
+          let outlineReason: string | undefined;
+          let symbols: ContextFile["symbols"] = [];
+          const fileId = fileIds.get(selectedFile.displayPath);
+          if (fileId === undefined) throw new Error(`Could not assign stable file ID: ${selectedFile.displayPath}`);
+
+          if (workspace !== undefined && selectedFile.outlinePath !== undefined) {
             try {
-              // Convert PDF to text via stdout to avoid temporary files
-              sourceBuffer = execFileSync("pdftotext", [selectedFile.fullPath, "-"], { maxBuffer: 1024 * 1024 * 50 });
-              converted = true;
-            } catch (err) {
-              // Fall through to binary error if pdftotext is missing or fails
-            }
-          }
-          if (!converted) {
-            throw new Error(`Selected file is binary: ${selectedFile.displayPath}`);
-          }
-        }
-        const content = decodeUtf8(sourceBuffer, selectedFile.displayPath);
-        let outlineStatus: ContextFile["outlineStatus"] = "unavailable";
-        let outlineReason: string | undefined;
-        let symbols: ContextFile["symbols"] = [];
-        const fileId = fileIds.get(selectedFile.displayPath);
-        if (fileId === undefined) throw new Error(`Could not assign stable file ID: ${selectedFile.displayPath}`);
-
-        if (workspace !== undefined && selectedFile.outlinePath !== undefined) {
-          try {
-            const result = await workspace.fileOutline({ path: selectedFile.outlinePath });
-            if (!("outline" in result)) {
-              outlineStatus = "refused";
-              outlineReason = `${result.reason}: ${result.reasonDetail}`;
-            } else if (result.reason === "UNSUPPORTED_LANGUAGE") {
-              outlineStatus = "unsupported";
-              outlineReason = result.reason;
-            } else if (result.error !== undefined) {
+              const result = await workspace.fileOutline({ path: selectedFile.outlinePath });
+              if (!("outline" in result)) {
+                outlineStatus = "refused";
+                outlineReason = `${result.reason}: ${result.reasonDetail}`;
+              } else if (result.reason === "UNSUPPORTED_LANGUAGE") {
+                outlineStatus = "unsupported";
+                outlineReason = result.reason;
+              } else if (result.error !== undefined) {
+                outlineStatus = "error";
+                outlineReason = result.error;
+              } else {
+                outlineStatus = result.partial ? "partial" : "available";
+                symbols = buildContextSymbols(fileId, result.outline, result.jumpTable);
+              }
+            } catch (error) {
               outlineStatus = "error";
-              outlineReason = result.error;
-            } else {
-              outlineStatus = result.partial ? "partial" : "available";
-              symbols = buildContextSymbols(fileId, result.outline, result.jumpTable);
+              outlineReason = errorMessage(error);
+              console.warn(`Warning: Could not outline ${selectedFile.displayPath}: ${outlineReason}`);
             }
-          } catch (error) {
-            outlineStatus = "error";
-            outlineReason = errorMessage(error);
-            console.warn(`Warning: Could not outline ${selectedFile.displayPath}: ${outlineReason}`);
           }
-        }
 
-        collected.push({
-          id: fileId,
-          path: selectedFile.displayPath,
-          ...(languageFromPath(selectedFile.displayPath) === undefined
-            ? {}
-            : { language: languageFromPath(selectedFile.displayPath) }),
-          content,
-          sourceBytes: sourceBuffer.byteLength,
-          sourceLines: sourceLineCount(content),
-          sourceHash: sha256(sourceBuffer),
-          projection: (args.options.lineNumbers ? "numbered" : "exact") satisfies ContentRepresentation,
-          projectionReason: args.options.lineNumbers ? "citation-gutter" : "selected",
-          outlineStatus,
-          ...(outlineReason === undefined ? {} : { outlineReason }),
-          symbols,
-        });
-        sourceByFileId.set(fileId, sourceBuffer);
-      } catch (error) {
-        const message = errorMessage(error);
-        const omission: ContextOmission = {
-          path: selectedFile.displayPath,
-          reason: message.includes("binary")
-            ? "selected-binary"
-            : message.includes("valid UTF-8")
-            ? "selected-invalid-utf8"
-            : "processing-error",
-          detail: message,
-        };
-        handleSelectionOmission(omissions, omission, args.missingPolicy);
-        if (args.missingPolicy === "record") {
-          console.warn(`Warning: Could not process ${selectedFile.displayPath}: ${errorMessage(error)}`);
+          sourceByFileId.set(fileId, sourceBuffer);
+          return {
+            id: fileId,
+            path: selectedFile.displayPath,
+            ...(languageFromPath(selectedFile.displayPath) === undefined
+              ? {}
+              : { language: languageFromPath(selectedFile.displayPath) }),
+            content,
+            sourceBytes: sourceBuffer.byteLength,
+            sourceLines: sourceLineCount(content),
+            sourceHash: sha256(sourceBuffer),
+            projection: (args.options.lineNumbers ? "numbered" : "exact") as ContentRepresentation,
+            projectionReason: (args.options.lineNumbers ? "citation-gutter" : "selected") as "selected" | "citation-gutter",
+            outlineStatus,
+            ...(outlineReason === undefined ? {} : { outlineReason }),
+            symbols,
+          };
+        } catch (error) {
+          const message = errorMessage(error);
+          const omission: ContextOmission = {
+            path: selectedFile.displayPath,
+            reason: message.includes("binary")
+              ? "selected-binary"
+              : message.includes("valid UTF-8")
+              ? "selected-invalid-utf8"
+              : "processing-error",
+            detail: message,
+          };
+          handleSelectionOmission(omissions, omission, args.missingPolicy);
+          if (args.missingPolicy === "record") {
+            console.warn(`Warning: Could not process ${selectedFile.displayPath}: ${errorMessage(error)}`);
+          }
+          return null;
         }
+      }));
+
+      for (const res of chunkResults) {
+        if (res !== null) collected.push(res);
       }
     }
   }
