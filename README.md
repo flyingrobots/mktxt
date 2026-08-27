@@ -1,221 +1,114 @@
-# mktxt & mktxtx
+# mktxt
 
-Tools to aggregate all non-binary files in a directory into a single text file.
+**mktxt** is a blazingly fast, deterministic context bundler designed to package source code for consumption by AI agents and LLMs. 
 
-## mktxtx (TypeScript + Graft)
+Instead of dumping raw text into a prompt, `mktxt` produces a verifiable **MKTCTX/5** artifact. It extracts dependency graphs, parses AST outlines (via [Graft](https://github.com/flyingrobots/graft)), automatically converts binary PDFs to text, and embeds files using cryptographic hash framing so agents receive a structured, mathematically verified working set.
 
-The modern version that uses AST parsing for robust symbol and signature extraction.
+## Installation
 
-## Install for the current user
-
-Run the installer from this checkout:
+The recommended way to install `mktxt` globally is via its self-contained installation script. 
 
 ```bash
-./scripts/install.sh
+# Installs to ~/.local/share/mktxt and symlinks to ~/.local/bin/mktxt
+./scripts/install.sh --prefix=$HOME/.local
 ```
 
-The default installation follows the conventional per-user layout:
+## Features
 
-```text
-~/.local/share/mktxt/
-├── current -> versions/5.1.0
-└── versions/5.1.0/       # compiled app and production dependencies
+- 🚀 **Parallel Execution:** Saturates I/O by batching file parsing and AST extraction asynchronously.
+- 📄 **PDF Extraction:** Automatically extracts text from `.pdf` binaries (requires `pdftotext`) asynchronously without blocking the event loop.
+- 🌳 **AST Outlines & Dependencies:** Uses `@flyingrobots/graft` to expose function/class signatures and builds module-resolution graphs.
+- 🔒 **Cryptographic Verification:** Every packet is emitted with a canonical JSON manifest, chunk-level file hashes, and a whole-envelope `sha256` trailer.
+- 📂 **Git Provenance:** Respects `.gitignore`, supports `--git-diff` generation, and accurately bounds context budget by selectively projecting out-of-scope files.
 
-~/.local/bin/mktxt        # primary command
-~/.local/bin/mktxtx       # compatibility alias
-```
+## Quickstart
 
-Each version directory is a complete copy of the compiled application and its frozen production dependency graph. The installer verifies that dependency symlinks remain inside that directory before activating it; it does not link back to this checkout. Installation requires Node.js 20.11 or newer and pnpm. The installed command requires Node.js at runtime; directory discovery and diff generation also use the system `git` and `diff` commands.
-
-Use an isolated prefix—useful for testing or packaging—with:
-
+Bundle a specific folder:
 ```bash
-./scripts/install.sh --prefix=/path/to/prefix
+mktxt --cwd=src --include-ext=ts --out=mysrc
 ```
 
-That creates `/path/to/prefix/share/mktxt` and `/path/to/prefix/bin/mktxt`. To use a layout such as `~/.bin/mktxt/` instead:
-
+Provide explicit files to bundle via stdin:
 ```bash
-./scripts/install.sh --install-root="$HOME/.bin/mktxt" --bin-dir="$HOME/.bin"
+git diff origin/main --name-only | mktxt --out=diff-context
 ```
 
-The installer safely replaces versions it owns, but refuses to overwrite a regular file or unrelated symlink already named `mktxt` or `mktxtx` in the selected bin directory.
-
-### Usage
-
-```bash
-./mktxtx [directories...] [--include-ext=<ext>] [--exclude-ext=<ext>] [--out=<name>] [--no-tests]
-./mktxtx [--cwd=<directory>] --files-from=<manifest-or-> [--out=<name>]
-./mktxtx [--profile=exact-selection|review|structure] [--symbols=useful|full|none]
-./mktxtx [--git-diff=<ref>] [--budget-tokens=<n>] [--task=<text>] [--emit-manifest]
-./mktxtx [--missing=error|record]
-./mktxtx verify <packet.mktctx|-> [--json]
-./mktxtx --format=legacy
-./mktxtx --version
-```
-
-Example:
-```bash
-./mktxtx --cwd=src --include-ext=ts --out=mysrc
-```
-
-When `--out` is omitted, the output name comes from the directory where the
-command is invoked—not from `--cwd`. Running the command from `~/git/mktxt`,
-for example, writes `mktxt.txt`. Use `--out=<name>` to override that basename,
-`--emit-manifest` to add the canonical JSON manifest, or `--emit-sidecars` to
-add the derived TOC, symbol CSV, previous aggregate, and unified diff.
-
-### Package an exact list of files
-
-Use `--files-from` when the aggregate must contain only explicitly selected files. Paths are resolved relative to `--cwd` (or the current directory when `--cwd` is omitted), retained in manifest order, and deduplicated by their canonical path.
-
-Newline-separated (`paths.txt`):
-
-```text
-src/index.ts
-README.md
-```
-
-JSON (`paths.json`):
-
-```json
-["src/index.ts", "README.md"]
-```
-
-JSONL (`paths.jsonl`):
-
-```jsonl
-{"path":"src/index.ts"}
-{"path":"README.md"}
-```
-
-Run it with a manifest file or pipe the manifest on stdin:
-
-```bash
-./mktxtx --cwd=/path/to/repo --files-from=paths.txt --out=selected
-printf '%s\n' src/index.ts README.md | ./mktxtx --cwd=/path/to/repo --files-from=- --out=selected
-git diff origin/main --name-only | mktxt
-```
-
-Non-empty piped stdin is detected automatically, so the final command is
-equivalent to using `--files-from=-`. Piped paths are resolved from the current
-directory, retained in order, and remain the only candidates. Missing paths,
-directories, and non-text files are warned about and recorded as structured
-diagnostics in this convenient pipeline form. Use `--missing=error` when any
-invalid or excluded candidate must fail before output is written; use
-`--missing=record` to continue explicitly. An explicit `--files-from` defaults
-to `error`, while implicit piped input and discovery default to `record`.
-
-Missing paths, directories, binary files, and output files named in the manifest are errors. Extension filters and `--no-tests` cannot be combined with `--files-from`, so the manifest remains the exact selection authority. JSON may also use `{"paths":[...]}`, and JSON/JSONL entries may be strings or `{"path":"..."}` objects.
-
-### Package verifiable LLM context with MKTCTX/5
-
-The default `context-v5` format is a self-contained, deterministic source
-context packet. Exact content preserves the original bytes of valid UTF-8
-files—including a UTF-8 BOM and LF, CRLF, or CR newlines. It adds canonical
-manifest identity, a strict whole-envelope trailer, verified byte-count
-framing, stable path IDs, compact and policy-controlled Graft outlines,
-syntax-level module edges, explicit omissions, mixed-fidelity projections,
-heuristic token budgets, and privacy-aware selection-request identity. V5
-separates the normalized caller request, generator policy, resolved candidates,
-included files, and omissions, and labels replayability as exact-request,
-policy-only, or descriptive.
-
-```bash
-mktxt \
-  --cwd=/path/to/repo \
-  --files-from=paths.jsonl \
-  --format=context-v5 \
-  --profile=exact-selection \
-  --symbols=useful \
-  --task="Review these files for unsafe path handling" \
-  --emit-manifest \
-  --out=review-context
-```
-
-This writes the self-contained `review-context.txt` and
-`review-context.manifest.json`. Add `--emit-sidecars` when you also want the
-derived TOC, symbol CSV, previous packet, and streaming diff.
-Use `--task-file=prompt.txt` instead of `--task` for a multiline task. The task
-is placed after all source context so that changing it does not change the
-canonical context manifest. Both task options are optional; omit them to create
-a reusable context artifact and provide the request separately.
-
-Verify a packet without its source repository:
-
-```bash
-mktxt verify review-context.txt
-mktxt verify review-context.txt --json
-```
-
-For code review, let `mktxt` capture the comparison instead of piping only
-file names:
-
+Generate an LLM code-review packet:
 ```bash
 mktxt \
   --cwd=/path/to/repo \
   --git-diff=origin/main \
   --profile=review \
-  --budget-tokens=100000 \
-  --out=review
+  --task="Review these files for unsafe path handling" \
+  --out=review-context
 ```
 
-This records branch, `HEAD`, resolved base commit, dirty posture, additions,
-modifications, deletions, renames, base blob hashes, and the declared
-working-tree source. Changed files and direct resolved dependency neighbors are
-exact; more distant files degrade explicitly to signatures, outlines, or
-references.
 
-The previous aggregate and four-output behavior remain available explicitly:
+## CLI Usage
 
+```text
+Usage: mktxt [directories...] [options]
+       mktxt verify <packet.mktctx|-> [--json]
+
+Aggregate selected UTF-8 source files for humans or language models.
+
+Options:
+  --cwd=DIR                 Add a source directory
+  --files-from=PATH|-       Package exactly the listed paths
+                            Non-empty piped stdin is detected automatically
+  --include-ext=EXT         Include only an extension (repeatable)
+  --exclude-ext=EXT         Exclude an extension (repeatable)
+  --no-tests                Exclude common test paths during discovery
+  --out=NAME                Override the output basename
+  --format=context-v5       Emit the MKTCTX/5 context protocol (default)
+  --format=context-v4       Emit the historical MKTCTX/4 protocol
+  --format=context-v3       Emit the historical MKTCTX/3 protocol
+  --format=legacy           Emit the original aggregate and sidecars
+  --profile=exact-selection Exact selected valid UTF-8 bytes (default)
+  --profile=review          Exact changes and neighbors; structural remainder
+  --profile=structure       Outlines and identities without source bodies
+  --symbols=useful|full|none
+                            Select derived symbol detail (default: useful)
+  --budget-tokens=N         Apply the declared bytes-div-4 heuristic budget
+  --missing=error|record    Fail before output or record structured diagnostics
+                            Defaults: error for --files-from; record otherwise
+  --git-diff=REF            Capture Git provenance and review REF..working-tree
+  --line-numbers            Emit a numbered citation view instead of exact chunks
+  --task=TEXT               Append one optional instruction after context data
+  --task-file=PATH          Read the task from a UTF-8 file
+  --emit-manifest           Emit <basename>.manifest.json with a context format
+  --emit-sidecars           Emit derived TOC, symbol CSV, previous file, and diff
+  -V, --version             Print the installed version
+  -h, --help                Show this help
+```
+
+## The MKTCTX/5 Protocol
+
+`mktxt` outputs a progressive-disclosure format called **MKTCTX/5**. It includes:
+1. **Header**: Request metadata and execution policies.
+2. **Index**: A flat, hashed index of every included file.
+3. **Symbols**: A structural outline of classes, interfaces, and functions.
+4. **Edges**: A directed dependency graph of the codebase slice.
+5. **Payload**: The exact byte-perfect source code embedded inside chunked demarcations.
+
+Agents can instantly verify they are looking at unaltered code by running the `verify` command directly on the packet:
 ```bash
-mktxt --format=legacy
+mktxt verify review-context.txt
 ```
 
-Use `--line-numbers` when citation accuracy is worth a gutter on every source
-line. It is an explicit numbered projection rather than exact source.
+> **Learn More**: Read [The MKTCTX Explainer](docs/explain.md) for a deep dive into how `mktxt` replaces Git bundles for AI agents.
 
-Use `--symbols=full` to retain every analyzer record or `--symbols=none` to
-disable symbols. The default `useful` policy removes unlocatable symbols and
-bounds structured-data depth while reporting analyzer totals and emitted
-counts. Token figures declare the `utf8-bytes-div-4-v1` heuristic; they are not
-presented as universal tokenizer counts.
 
-The protocol and design rationale are specified in
-[`docs/context-format-v5.md`](docs/context-format-v5.md). A generated, taskless
-example is available at
-[`docs/examples/mktctx-v5-exact.mktctx`](docs/examples/mktctx-v5-exact.mktctx),
-with numbered and adversarial companions in the same directory. The progressive
-[`docs/explain.md`](docs/explain.md) guide reads that exact fixture end to end
-and compares its job with Git bundles. MKTCTX/4 and MKTCTX/3 remain available
-explicitly and are documented in
-[`docs/context-format-v4.md`](docs/context-format-v4.md) and
-[`docs/context-format-v3.md`](docs/context-format-v3.md).
+## FAQ
 
-### Outputs
+**Q: How is this different from a Git bundle?**
+A Git bundle moves a repository's history and objects, leaving the receiver to figure out what files actually matter for a given task. `mktxt` does the opposite: it produces a targeted, task-shaped working set. Instead of saying "here is the repo," it says "here are the 5 relevant files, their AST outlines, their dependency graph, and their cryptographically verified source bytes."
 
-- `mysrc.txt`: Self-contained MKTCTX/5 context by default.
-- `mysrc.manifest.json`: Canonical v5 metadata with `--emit-manifest`.
-- `mysrc_toc.md`: Derived table of contents with `--emit-sidecars` or legacy mode.
-- `mysrc_symbols.csv`: Derived symbol table with `--emit-sidecars` or legacy mode.
-- `mysrc_diff.txt`: Streaming unified diff with `--emit-sidecars` or legacy mode.
-- `mysrc.prev.txt`: Previous aggregate retained with `--emit-sidecars` or legacy mode.
+**Q: Is this just a zip file of code?**
+No. A zip file is an opaque binary blob that an LLM cannot natively read. An MKTCTX packet is a deterministic, plain-text artifact that progressively discloses information. An agent can read the index and AST outlines at the top of the file to understand the architecture *before* deciding to read the heavy source-code chunks at the bottom.
 
----
+**Q: Why not just pipe `cat **/*` into my LLM prompt?**
+Naive concatenation destroys file provenance, corrupts easily on binary files (like PDFs), and breaks completely if the source code happens to contain control tokens that confuse the LLM. `mktxt` safely extracts text from binaries, strictly frames source bytes to prevent injection, and provides stable line-number addressing so agents can accurately cite line ranges in code reviews.
+## License
 
-## mktxt (Legacy Bash)
-...
-
-## Features
-
-- **Multiple Directories**: Pass one or more directories as positional arguments to aggregate them all.
-- **Extension Filter**: Use `--ext=foo` to quickly include only files with the `.foo` extension.
-- **Glob Filter**: Use `--filter="*.ext"` (or the legacy `filter="*.ext"`) to filter files by glob pattern.
-- **Exclude Filter**: Use one or more `--exclude=<pattern>` or `--excludes=<pattern>` arguments to skip files or directories (for example, `--exclude=docs/` skips `docs/` recursively).
-- **Ignore Tests**: Use `--no-tests` to exclude common test files and directories (e.g., `*_test.go`, `tests/`, `__tests__/`).
-- **Git Integration**: Respects `.gitignore` by using `git ls-files` when inside a Git repository, including untracked files.
-- **Binary Detection**: Excludes binary and empty files automatically.
-- **Cycle Detection**: Detects and avoids infinite loops from symlinks and skips duplicate file contents (using canonical paths).
-- **JSONL Output**: Emits JSONL for each file processed and a final summary: `{"path":"...","lines":...,"size":...}`.
-- **Diff Tracking**: Rotates previous output and generates a diff (`.prev.txt` and `.prev.diff.txt`).
-- **Headers**: Formats each file in the aggregate with its relative path as a header.
+This project is licensed under the Apache 2.0 License. See the [LICENSE](LICENSE) file for details.
