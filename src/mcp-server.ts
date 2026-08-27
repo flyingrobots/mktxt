@@ -15,7 +15,7 @@ const execFileAsync = promisify(execFile);
 const server = new Server(
   {
     name: "mktxt-mcp",
-    version: "5.1.0",
+    version: "5.2.0",
   },
   {
     capabilities: {

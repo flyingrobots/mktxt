@@ -13,7 +13,7 @@ test("--version reports the package version without creating outputs", async (t)
   const result = runCli(["--version"], undefined, fixture);
 
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), "mktxt 5.1.0");
+  assert.equal(result.stdout.trim(), "mktxt 5.2.0");
   assert.deepEqual((await fs.readdir(fixture)).sort(), ["nested", "omitted.txt", "one.ts"]);
 });
 

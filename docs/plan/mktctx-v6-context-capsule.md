@@ -10,7 +10,7 @@
 | Target storage contracts | `MKTIDX/1`, `MKTPACK/1` |
 | Target resolver contracts | `MKTCTX-RESOLVE/1`, `MKTCTX-RESULT/1` |
 | Target agent adapter | `MKTCTX-MCP/1` |
-| Current released baseline | `MKTCTX/5`, `mktxt 5.1.0` |
+| Current released baseline | `MKTCTX/5`, `mktxt 5.2.0` |
 
 This document captures the design direction established during planning, not
 an implemented or accepted wire format. `mktxt` must not emit `MKTCTX/6`

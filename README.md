@@ -82,6 +82,35 @@ Options:
   -h, --help                Show this help
 ```
 
+
+## Model Context Protocol (MCP) Server
+
+`mktxt` can operate natively as an MCP server, allowing AI agents to dynamically generate verified context payloads on-demand.
+
+### What it does
+The MCP server exposes a `generate_context` tool. When an agent calls this tool with a repository path, `mktxt` will generate a deterministic `MKTCTX/5` packet locally and return the absolute file path directly to the agent.
+
+### How to use it
+Since the MCP server is built directly into `mktxt`, you can configure your AI agent (like Claude Desktop or an Antigravity agent) to spawn it.
+
+Add the following configuration to your agent's MCP settings:
+```json
+{
+  "mcpServers": {
+    "mktxt": {
+      "command": "mktxt",
+      "args": ["--mcp"]
+    }
+  }
+}
+```
+*(Note: Replace `mktxt` with the absolute path if it is not in your agent's PATH).*
+
+To run the MCP server manually for testing:
+```bash
+npm run mcp
+```
+
 ## The MKTCTX/5 Protocol
 
 `mktxt` outputs a progressive-disclosure format called **MKTCTX/5**. It includes:

@@ -99,6 +99,10 @@ async function main(): Promise<void> {
     await runVerify(args.slice(1));
     return;
   }
+  if (args[0] === "--mcp") {
+    await runMcp();
+    return;
+  }
   if (args.includes("--version") || args.includes("-V")) {
     console.log(`mktxt ${await readVersion()}`);
     return;
@@ -702,6 +706,13 @@ async function readVersion(): Promise<string> {
     throw new Error("package.json does not contain a valid version");
   }
   return packageJson.version;
+}
+
+
+async function runMcp(): Promise<void> {
+  const mcpServerPath = new URL("./mcp-server.js", import.meta.url).pathname;
+  // Dynamic import the MCP server module
+  await import(mcpServerPath);
 }
 
 async function runVerify(args: readonly string[]): Promise<void> {

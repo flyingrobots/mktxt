@@ -1,6 +1,6 @@
 # MKTCTX/5: a verifiable, budget-aware source-context packet
 
-MKTCTX/5 is the default output protocol of `mktxt` 5.1.0. It is an
+MKTCTX/5 is the default output protocol of `mktxt` 5.2.0. It is an
 incompatible successor to MKTCTX/4. The v3 and v4 renderers remain available
 through explicit `--format` values; new packets should use `context-v5`.
 

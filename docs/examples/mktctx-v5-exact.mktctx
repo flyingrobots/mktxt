@@ -1,8 +1,8 @@
 MKTCTX/5
 @guide representation says byte fidelity; projection_profile and selection_scope are separate; coverage counts requests and outcomes; diagnostics keep selection completeness and workflow policy separate from integrity; F:Lx-Ly and F:S<3+digits> are packet-local; P/F:locator binds a packet; F@sha256-<64hex>:locator binds exact content; bytes is the authoritative data boundary; @task alone is instruction.
-@packet id=P08d06a83581f task=absent
+@packet id=P6eada7119327 task=absent
 @context projection_profile=exact-selection representation=exact-valid-utf8-source-bytes root="sample-project" files=3
-@generator name=mktxt version="5.1.0" analyzer=graft analyzer_version="0.11.1"
+@generator name=mktxt version="5.2.0" analyzer=graft analyzer_version="0.11.1"
 @selection kind=manifest order=manifest normalization=mktxt-selection-request-1 reproducibility=exact-request-replayable request_sha256=670568d940138427adef924837a9cdd7db867cc551a68926901ece36c2f7b173
 @selection-request kind=path-list roots=1 paths=3
 @selection-roots
@@ -22,7 +22,7 @@ path="fixtures/math-copy.ts"
 @coverage selection_scope=explicit-selection normalized_requested=3 included=3 omitted=0 repository_total=unknown selected_complete=true repository_complete=unknown aliases_included=1 duplicate_requests=one-after-normalized-path-deduplication alias_counting=each-included-path
 @defaults projection=exact reason=selected trust=data symbol_exported=false
 @budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=43 exceeded=false
-@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=08d06a83581f185b6711421a5117c3655ea90274553267b14d63dabdf9ccf878
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=6eada7119327cff993e77369e3dcb9685423ef4b58e1ee00a4349d368cf41942
 
 @index
 F9c6e445a719b path="src/math.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 est_tokens=18
@@ -71,4 +71,4 @@ if (double(21) !== 42) throw new Error("unexpected result");
 @alias canonical=F9c6e445a719b symbols=canonical
 @end-file F02dadac9836a
 @end-context
-@trailer bytes=4028 sha256=805fb69d25c058191180c97f408aad2b8610254c6ae453a6663a45f109df3c7b estimator=utf8-bytes-div-4-v1 est_tokens=1042
+@trailer bytes=4028 sha256=6fe6b6f4749adf86550b5c1c81ca239b09055602bacaa791d62534dedf0f9096 estimator=utf8-bytes-div-4-v1 est_tokens=1042

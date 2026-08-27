@@ -19,9 +19,9 @@ if (`${embedded}\n` !== fixture) throw new Error("Explainer's canonical packet d
 
 const verified = verifyContextV5(Buffer.from(fixture, "utf8"));
 const expected = {
-  packetId: "P08d06a83581f",
-  manifestSha256: "08d06a83581f185b6711421a5117c3655ea90274553267b14d63dabdf9ccf878",
-  envelopeSha256: "805fb69d25c058191180c97f408aad2b8610254c6ae453a6663a45f109df3c7b",
+  packetId: "P6eada7119327",
+  manifestSha256: "6eada7119327cff993e77369e3dcb9685423ef4b58e1ee00a4349d368cf41942",
+  envelopeSha256: "6fe6b6f4749adf86550b5c1c81ca239b09055602bacaa791d62534dedf0f9096",
 };
 for (const [key, value] of Object.entries(expected)) {
   if (verified[key] !== value) throw new Error(`Explainer fixture ${key} changed: ${verified[key]} != ${value}`);

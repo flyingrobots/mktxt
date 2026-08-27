@@ -1,6 +1,6 @@
 {
   "name": "mktxtx",
-  "version": "5.1.0",
+  "version": "5.2.0",
   "description": "TypeScript rewrite of mktxt using Graft",
   "author": "James Ross <james@flyingrobots.dev>",
   "keywords": [
