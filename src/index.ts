@@ -592,8 +592,22 @@ async function collectContextFiles(args: {
       }
 
       try {
-        const sourceBuffer = await fs.readFile(selectedFile.fullPath);
-        if (sourceBuffer.includes(0)) throw new Error(`Selected file is binary: ${selectedFile.displayPath}`);
+        let sourceBuffer = await fs.readFile(selectedFile.fullPath);
+        if (sourceBuffer.includes(0)) {
+          let converted = false;
+          if (selectedFile.displayPath.toLowerCase().endsWith(".pdf")) {
+            try {
+              // Convert PDF to text via stdout to avoid temporary files
+              sourceBuffer = execFileSync("pdftotext", [selectedFile.fullPath, "-"], { maxBuffer: 1024 * 1024 * 50 });
+              converted = true;
+            } catch (err) {
+              // Fall through to binary error if pdftotext is missing or fails
+            }
+          }
+          if (!converted) {
+            throw new Error(`Selected file is binary: ${selectedFile.displayPath}`);
+          }
+        }
         const content = decodeUtf8(sourceBuffer, selectedFile.displayPath);
         let outlineStatus: ContextFile["outlineStatus"] = "unavailable";
         let outlineReason: string | undefined;
