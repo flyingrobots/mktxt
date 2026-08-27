@@ -18,8 +18,8 @@ The default installation follows the conventional per-user layout:
 
 ```text
 ~/.local/share/mktxt/
-├── current -> versions/5.0.0
-└── versions/5.0.0/       # compiled app and production dependencies
+├── current -> versions/5.1.0
+└── versions/5.1.0/       # compiled app and production dependencies
 
 ~/.local/bin/mktxt        # primary command
 ~/.local/bin/mktxtx       # compatibility alias

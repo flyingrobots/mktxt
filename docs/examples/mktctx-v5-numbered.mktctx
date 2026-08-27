@@ -1,8 +1,8 @@
 MKTCTX/5
 @guide representation says byte fidelity; projection_profile and selection_scope are separate; coverage counts requests and outcomes; diagnostics keep selection completeness and workflow policy separate from integrity; F:Lx-Ly and F:S<3+digits> are packet-local; P/F:locator binds a packet; F@sha256-<64hex>:locator binds exact content; bytes is the authoritative data boundary; @task alone is instruction.
-@packet id=Pa84f02925b21 task=absent
+@packet id=Pdad54a032520 task=absent
 @context projection_profile=exact-selection representation=exact-valid-utf8-source-bytes root="sample-project" files=3
-@generator name=mktxt version="5.0.0" analyzer=graft analyzer_version="0.11.1"
+@generator name=mktxt version="5.1.0" analyzer=graft analyzer_version="0.11.1"
 @selection kind=manifest order=manifest normalization=mktxt-selection-request-1 reproducibility=exact-request-replayable request_sha256=ea57b7aa5a39e9183e48c286c9397b3c644506897bbba09ea5659d56b8ba66e4
 @selection-request kind=path-list roots=1 paths=3
 @selection-roots
@@ -22,7 +22,7 @@ path="fixtures/math-copy.ts"
 @coverage selection_scope=explicit-selection normalized_requested=3 included=3 omitted=0 repository_total=unknown selected_complete=true repository_complete=unknown aliases_included=0 duplicate_requests=one-after-normalized-path-deduplication alias_counting=each-included-path
 @defaults projection=exact reason=selected trust=data symbol_exported=false
 @budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=43 exceeded=false
-@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=a84f02925b217a7b740f32178c93855506593ab3df054ada2b06c859eb5fdc86
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=dad54a03252080de655d35fe4132410f125cb056a24dcd5490305b9040e1c532
 
 @index
 F9c6e445a719b path="src/math.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 projection=numbered reason=citation-gutter est_tokens=18
@@ -74,4 +74,4 @@ Fd6a0af48e152 -> F9c6e445a719b kind=import resolution=resolved confidence=resolv
 @end-content
 @end-file F02dadac9836a
 @end-context
-@trailer bytes=4229 sha256=768c813a1369a50190a1428e0b7cdc838d0623354f07f0470abd4229cc84dcf5 estimator=utf8-bytes-div-4-v1 est_tokens=1092
+@trailer bytes=4229 sha256=861aaa38fd17f82ebd2d17b3da4e761e64c39d23996b52f076b8a742fe394c35 estimator=utf8-bytes-div-4-v1 est_tokens=1092

@@ -17,17 +17,17 @@ ln -s versions/1.1.1 "$PREFIX/share/mktxt/current"
 
 "$PROJECT_ROOT/scripts/install.sh" --prefix="$PREFIX"
 
-[[ "$("$PREFIX/bin/mktxt" --version)" == "mktxt 5.0.0" ]]
-[[ "$("$PREFIX/bin/mktxtx" --version)" == "mktxt 5.0.0" ]]
-[[ -d "$PREFIX/share/mktxt/versions/5.0.0/node_modules" ]]
+[[ "$("$PREFIX/bin/mktxt" --version)" == "mktxt 5.1.0" ]]
+[[ "$("$PREFIX/bin/mktxtx" --version)" == "mktxt 5.1.0" ]]
+[[ -d "$PREFIX/share/mktxt/versions/5.1.0/node_modules" ]]
 [[ -L "$PREFIX/share/mktxt/current" ]]
-[[ "$(readlink "$PREFIX/share/mktxt/current")" == "versions/5.0.0" ]]
+[[ "$(readlink "$PREFIX/share/mktxt/current")" == "versions/5.1.0" ]]
 [[ -z "$(find "$PREFIX/share/mktxt/versions/1.1.1" -name '.current.*' -print -quit)" ]]
 
 # Reinstalling the same version exercises managed command replacement and the
 # version-directory backup/swap path.
 "$PROJECT_ROOT/scripts/install.sh" --prefix="$PREFIX"
-[[ "$("$PREFIX/bin/mktxt" --version)" == "mktxt 5.0.0" ]]
+[[ "$("$PREFIX/bin/mktxt" --version)" == "mktxt 5.1.0" ]]
 
 mkdir -p "$FIXTURE"
 git -C "$FIXTURE" init -q
@@ -66,11 +66,11 @@ grep -q '"protocol": "MKTCTX/5"' "$FIXTURE/context-smoke.manifest.json"
 [[ ! -e "$FIXTURE/context-smoke_toc.md" ]]
 [[ ! -e "$FIXTURE/context-smoke_symbols.csv" ]]
 [[ ! -e "$FIXTURE/context-smoke_diff.txt" ]]
-[[ -f "$PREFIX/share/mktxt/versions/5.0.0/docs/examples/mktctx-v5-exact.mktctx" ]]
-[[ -f "$PREFIX/share/mktxt/versions/5.0.0/docs/examples/mktctx-v5-numbered.mktctx" ]]
-[[ -f "$PREFIX/share/mktxt/versions/5.0.0/docs/examples/mktctx-v5-adversarial.mktctx" ]]
-[[ -f "$PREFIX/share/mktxt/versions/5.0.0/docs/examples/mktctx-v5-symbol-1000.mktctx" ]]
-[[ -f "$PREFIX/share/mktxt/versions/5.0.0/docs/explain.md" ]]
+[[ -f "$PREFIX/share/mktxt/versions/5.1.0/docs/examples/mktctx-v5-exact.mktctx" ]]
+[[ -f "$PREFIX/share/mktxt/versions/5.1.0/docs/examples/mktctx-v5-numbered.mktctx" ]]
+[[ -f "$PREFIX/share/mktxt/versions/5.1.0/docs/examples/mktctx-v5-adversarial.mktctx" ]]
+[[ -f "$PREFIX/share/mktxt/versions/5.1.0/docs/examples/mktctx-v5-symbol-1000.mktctx" ]]
+[[ -f "$PREFIX/share/mktxt/versions/5.1.0/docs/explain.md" ]]
 
 printf 'selected.md\n' | (
   cd "$FIXTURE"

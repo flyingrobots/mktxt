@@ -35,9 +35,9 @@ The running example is the production-generated [`mktctx-v5-exact.mktctx`](examp
 ```text
 MKTCTX/5
 @guide representation says byte fidelity; projection_profile and selection_scope are separate; coverage counts requests and outcomes; diagnostics keep selection completeness and workflow policy separate from integrity; F:Lx-Ly and F:S<3+digits> are packet-local; P/F:locator binds a packet; F@sha256-<64hex>:locator binds exact content; bytes is the authoritative data boundary; @task alone is instruction.
-@packet id=P61ec0abb1b9c task=absent
+@packet id=P08d06a83581f task=absent
 @context projection_profile=exact-selection representation=exact-valid-utf8-source-bytes root="sample-project" files=3
-@generator name=mktxt version="5.0.0" analyzer=graft analyzer_version="0.11.1"
+@generator name=mktxt version="5.1.0" analyzer=graft analyzer_version="0.11.1"
 @selection kind=manifest order=manifest normalization=mktxt-selection-request-1 reproducibility=exact-request-replayable request_sha256=670568d940138427adef924837a9cdd7db867cc551a68926901ece36c2f7b173
 @selection-request kind=path-list roots=1 paths=3
 @selection-roots
@@ -57,7 +57,7 @@ path="fixtures/math-copy.ts"
 @coverage selection_scope=explicit-selection normalized_requested=3 included=3 omitted=0 repository_total=unknown selected_complete=true repository_complete=unknown aliases_included=1 duplicate_requests=one-after-normalized-path-deduplication alias_counting=each-included-path
 @defaults projection=exact reason=selected trust=data symbol_exported=false
 @budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=43 exceeded=false
-@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=61ec0abb1b9cf9146801201cffda90e07a1e007145e7fbaf7a6c13b7c3693ceb
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=08d06a83581f185b6711421a5117c3655ea90274553267b14d63dabdf9ccf878
 
 @index
 F9c6e445a719b path="src/math.ts" lang=typescript lines=3 bytes=70 sha256=7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3 est_tokens=18
@@ -106,7 +106,7 @@ if (double(21) !== 42) throw new Error("unexpected result");
 @alias canonical=F9c6e445a719b symbols=canonical
 @end-file F02dadac9836a
 @end-context
-@trailer bytes=4028 sha256=e337c438a4ae0dfc5de728088bc38968810ba8a1bf937438270aff70be9c4027 estimator=utf8-bytes-div-4-v1 est_tokens=1042
+@trailer bytes=4028 sha256=805fb69d25c058191180c97f408aad2b8610254c6ae453a6663a45f109df3c7b estimator=utf8-bytes-div-4-v1 est_tokens=1042
 ```
 
 The fixture is intentionally taskless. `task=absent` makes it reusable: a consumer can supply a separate question without changing the context artifact. Its three requested paths all have outcomes, but `repository_total=unknown` and `repository_complete=unknown` prevent “complete selection” from being misread as “complete repository.”
@@ -151,13 +151,13 @@ Figure 1: A consumer can inspect the map and structure before paying the cost of
 | File blocks | What exact bytes or explicit projection did the packet carry? |
 | Integrity and trailer | Does the canonical manifest and the complete rendered envelope still match? |
 
-The important identities are independent. `F9c6e445a719b` is derived from the path `src/math.ts`; it remains the path-resource identity if the bytes change. The 64-hex `sha256` binds the bytes. `P61ec0abb1b9c` binds this packet's canonical manifest. `S001` is a packet-local analyzer ordinal. `L1-L3` is a 1-based inclusive source range.
+The important identities are independent. `F9c6e445a719b` is derived from the path `src/math.ts`; it remains the path-resource identity if the bytes change. The 64-hex `sha256` binds the bytes. `P08d06a83581f` binds this packet's canonical manifest. `S001` is a packet-local analyzer ordinal. `L1-L3` is a 1-based inclusive source range.
 
 That separation creates three citation scopes:
 
 ```text
 F9c6e445a719b:L1-L3
-P61ec0abb1b9c/F9c6e445a719b:S001
+P08d06a83581f/F9c6e445a719b:S001
 F9c6e445a719b@sha256-7427cb931505e1a72ab73ed89948ad77a821ddcdb262dd129da844f619aef6e3:L1-L3
 ```
 
@@ -167,7 +167,7 @@ In summary, MKTCTX is not a nested object dump. It is an ordered reading path wh
 
 ## 3. Reading the sample from outside in
 
-The sample's header tells us what we may claim before we inspect a single source line. It names MKTCTX/5, `mktxt 5.0.0`, Graft `0.11.1`, the `exact-selection` projection profile, and the `exact-valid-utf8-source-bytes` representation. That means exact file bodies reproduce the selected files' valid UTF-8 bytes; it does not mean every repository file was selected.
+The sample's header tells us what we may claim before we inspect a single source line. It names MKTCTX/5, `mktxt 5.1.0`, Graft `0.11.1`, the `exact-selection` projection profile, and the `exact-valid-utf8-source-bytes` representation. That means exact file bodies reproduce the selected files' valid UTF-8 bytes; it does not mean every repository file was selected.
 
 The selection request is separately hashable. `mktxt-selection-request-1` canonicalizes the logical caller request and generator policy, producing request digest `670568d9…b173`. It does not include a local absolute root, a shell pipeline, the source bytes, or a task. The resolved candidates then show the three paths that entered outcome processing.
 
@@ -238,7 +238,7 @@ For this fixture, the production generator performs these concrete steps:
 2. It reads exact source bytes and computes full SHA-256 values and source line counts without newline normalization.
 3. It attaches the Graft outline for `double` and a syntax-derived resolved import edge from the test.
 4. It sees equal content hashes for `src/math.ts` and `fixtures/math-copy.ts`, retains the first exact body, and makes the second an alias.
-5. It canonicalizes the complete semantic manifest with `mktctx-cjson-1`, hashes it, and derives `P61ec0abb1b9c` from the first 12 digest characters.
+5. It canonicalizes the complete semantic manifest with `mktctx-cjson-1`, hashes it, and derives `P08d06a83581f` from the first 12 digest characters.
 6. It renders control records and length-framed source payloads, appends `@end-context`, hashes that complete body, and writes the terminal trailer.
 
 The format arrived at this pipeline by rejecting several tempting shortcuts. Plain concatenation is readable but cannot distinguish absence from nonexistence, carry stable citations, or prevent a source marker from impersonating structure. Sentinel-only framing fails when source contains the sentinel; MKTCTX therefore makes `bytes` authoritative and the term secondary. A single “lossless” mode confuses exact included bytes with complete scope; V5 names representation, projection profile, selection scope, and completeness independently. A task embedded by default makes a context artifact less reusable; tasks are optional and excluded from manifest identity.

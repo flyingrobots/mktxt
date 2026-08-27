@@ -1,8 +1,8 @@
 MKTCTX/5
 @guide representation says byte fidelity; projection_profile and selection_scope are separate; coverage counts requests and outcomes; diagnostics keep selection completeness and workflow policy separate from integrity; F:Lx-Ly and F:S<3+digits> are packet-local; P/F:locator binds a packet; F@sha256-<64hex>:locator binds exact content; bytes is the authoritative data boundary; @task alone is instruction.
-@packet id=P5f8a2f1b0e52 task=absent
+@packet id=P95af9c897462 task=absent
 @context projection_profile=exact-selection representation=exact-valid-utf8-source-bytes root="sample-project" files=1
-@generator name=mktxt version="5.0.0" analyzer=graft analyzer_version="0.11.1"
+@generator name=mktxt version="5.1.0" analyzer=graft analyzer_version="0.11.1"
 @selection kind=manifest order=manifest normalization=mktxt-selection-request-1 reproducibility=exact-request-replayable request_sha256=0f6ac0f947d90f9eb6aa2786de4a2b64f8105da19759a77a958669c7763b0295
 @selection-request kind=path-list roots=1 paths=1
 @selection-roots
@@ -18,7 +18,7 @@ path="fixtures/thousand-symbols.ts"
 @coverage selection_scope=explicit-selection normalized_requested=1 included=1 omitted=0 repository_total=unknown selected_complete=true repository_complete=unknown aliases_included=0 duplicate_requests=one-after-normalized-path-deduplication alias_counting=each-included-path
 @defaults projection=exact reason=selected trust=data symbol_exported=false
 @budget estimator=utf8-bytes-div-4-v1 posture=heuristic estimated=13 exceeded=false
-@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=5f8a2f1b0e525cae5c4e1d76adc66a51a7dba8661e433291f1028e58c5d34cd2
+@integrity manifest_c14n=mktctx-cjson-1 manifest_sha256=95af9c897462816e6a85ef3c7b80be6a8ed49d66a959d41603bda082ba05f81f
 
 @index
 F2723fd0fcab0 path="fixtures/thousand-symbols.ts" lang=typescript lines=2 bytes=52 sha256=98cd859bbc8da54919a625a4e66a1b609f39489dea1bc338045bcfcd58a201ac est_tokens=13
@@ -49,4 +49,4 @@ export const v1000 = 1000;
 @end-content
 @end-file F2723fd0fcab0
 @end-context
-@trailer bytes=3047 sha256=5558f4a8aac04e74894659fd3916f8feeaf4f9b587e7d77f0439a89f4e7d9982 estimator=utf8-bytes-div-4-v1 est_tokens=796
+@trailer bytes=3047 sha256=02acf502e6567970b8756fb29af527e0871c1cc109fc596455d486253c6d6fef estimator=utf8-bytes-div-4-v1 est_tokens=796

@@ -6,14 +6,14 @@ import { spawnSync } from "node:child_process";
 import test from "node:test";
 
 const projectRoot = path.resolve(import.meta.dirname, "..");
-const cliPath = path.join(projectRoot, "mktxtx");
+
 
 test("--version reports the package version without creating outputs", async (t) => {
   const fixture = await createFixture(t);
   const result = runCli(["--version"], undefined, fixture);
 
   assert.equal(result.status, 0, result.stderr);
-  assert.equal(result.stdout.trim(), "mktxt 5.0.0");
+  assert.equal(result.stdout.trim(), "mktxt 5.1.0");
   assert.deepEqual((await fs.readdir(fixture)).sort(), ["nested", "omitted.txt", "one.ts"]);
 });
 
@@ -417,8 +417,11 @@ async function createFixture(t: test.TestContext): Promise<string> {
   return fixture;
 }
 
+const entryPath = path.join(projectRoot, "src/index.ts");
+const tsxPath = path.join(projectRoot, "node_modules/.bin/tsx");
+
 function runCli(args: string[], input?: string, cwd = projectRoot) {
-  return spawnSync(cliPath, args, {
+  return spawnSync(tsxPath, [entryPath, ...args], {
     cwd,
     encoding: "utf8",
     input,

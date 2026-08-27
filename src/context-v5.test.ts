@@ -356,7 +356,7 @@ function packet(files: readonly V5File[], task?: string): V5Packet {
     rootLabel: "fixture",
     selectionKind: "manifest",
     selectionOrder: "manifest",
-    generatorVersion: "5.0.0",
+    generatorVersion: "5.1.0",
     analyzerName: "unavailable",
     symbolPolicy: "useful",
     normalizedRequested: files.length,
